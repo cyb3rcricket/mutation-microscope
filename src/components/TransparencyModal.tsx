@@ -72,23 +72,36 @@ export const TransparencyModal: React.FC<TransparencyModalProps> = ({
           <div className="space-y-3 bg-obsidian-950/80 p-4 rounded-xl border border-white/5">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <Layers className="w-4 h-4 text-dna-emerald" />
-              <span>2. Raw Scores vs Quantile Scores</span>
+              <span>2. Scoring Metric Hierarchy: Raw vs Quantile vs Atlas AVI</span>
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <p className="text-xs text-slate-300">
+              AlphaGenome distinguishes between assay-specific effect sizes, calibrated empirical ranks, and multi-modal composite variant impact metrics:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
               <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5 space-y-1">
-                <strong className="text-cyan-300 font-mono">Raw Score (Effect Magnitude):</strong>
-                <p className="text-slate-300">
-                  Reflects the assay-specific fold change. For RNA-seq, the raw score approximates the log2 fold-change in steady-state transcript level. For splicing, it measures the shift in splice site probability (max |ALT - REF|).
+                <strong className="text-cyan-300 font-mono">1. Scorer Raw Score:</strong>
+                <p className="text-slate-300 text-[11px]">
+                  Direct assay-specific effect size. For RNA-seq, it represents predicted log2 fold-change in transcript abundance. For splice sites, it measures delta donor/acceptor probability.
                 </p>
               </div>
 
               <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5 space-y-1">
-                <strong className="text-emerald-300 font-mono">Quantile Score (Empirical Significance):</strong>
-                <p className="text-slate-300">
-                  Represents the percentile rank compared against an empirical background of ~300,000 common human genetic variants (gnomAD v3, MAF &gt; 0.01). A quantile of 0.99998 indicates that the variant's predicted effect surpasses 99.998% of common polymorphisms.
+                <strong className="text-emerald-300 font-mono">2. Scorer Quantile Score:</strong>
+                <p className="text-slate-300 text-[11px]">
+                  Assay-specific empirical significance calibrated against ~300,000 common human variants in gnomAD v3 (MAF &gt; 0.01). A quantile of 0.99998 indicates the effect exceeds 99.998% of common polymorphisms.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5 space-y-1">
+                <strong className="text-amber-300 font-mono">3. AlphaGenome Atlas AVI:</strong>
+                <p className="text-slate-300 text-[11px]">
+                  The official AlphaGenome Variant Impact composite score combining sequence-based regulatory predictions with AlphaMissense coding impact into a single prioritization metric.
                 </p>
               </div>
             </div>
+            <p className="text-[11px] text-slate-400 italic">
+              Note: Where composite Atlas AVI is not available, Mutation Microscope transparently displays the top calibrated AlphaGenome Scorer Quantile and explicitly marks AVI as unavailable.
+            </p>
           </div>
 
           {/* Section 3: In Silico Mutagenesis */}
@@ -101,7 +114,7 @@ export const TransparencyModal: React.FC<TransparencyModalProps> = ({
               <strong>In Silico Mutagenesis (ISM)</strong> systematically mutates every base pair in a local window into all three alternative nucleotides and computes the resulting model predictions. This generates sequence logos and sensitivity matrices that highlight the specific transcription factor binding motifs (such as ETS, GATA1, or core promoters) driving the effect.
             </p>
             <p>
-              <strong>Sashimi plots</strong> represent RNA splicing junctions as parabolic arcs connecting donor and acceptor exons. The arc heights and labels illustrate the predicted split reads, clearly capturing phenomena like cryptic splice donor activation (e.g. in <em>COL6A2</em>) or complete exon skipping (e.g. in <em>SMN2</em>).
+              <strong>Sashimi plots</strong> represent RNA splicing junctions as parabolic arcs connecting donor and acceptor exons. Arcs illustrate predicted splice junction signals (rather than physical sequencer read counts), clearly visualizing phenomena like cryptic splice donor activation (e.g. in <em>COL6A2</em>) or complete exon skipping (e.g. in <em>SMN2</em>).
             </p>
           </div>
 
@@ -127,7 +140,40 @@ export const TransparencyModal: React.FC<TransparencyModalProps> = ({
             </ul>
           </div>
 
-          {/* Section 5: Citations and Provenance */}
+          {/* Section 5: 5-Tier Provenance Classification */}
+          <div className="space-y-2 bg-obsidian-950/80 p-4 rounded-xl border border-white/5">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <Layers className="w-4 h-4 text-dna-cyan" />
+              <span>5. Transparent 5-Tier Data Provenance Framework</span>
+            </h3>
+            <p className="text-xs text-slate-300">
+              Every datum in Mutation Microscope is audited and mapped to one of five verification categories:
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+              <div className="p-2.5 rounded bg-white/[0.02] border border-cyan-500/30 text-slate-300">
+                <strong className="text-cyan-300 block">Tier 1: AlphaGenome API</strong>
+                Live predictions queried directly from Google DeepMind's Python client.
+              </div>
+              <div className="p-2.5 rounded bg-white/[0.02] border border-indigo-500/30 text-slate-300">
+                <strong className="text-indigo-300 block">Tier 2: AlphaGenome Atlas</strong>
+                Official Atlas AVI composite impact scores and feature attributions.
+              </div>
+              <div className="p-2.5 rounded bg-white/[0.02] border border-blue-500/30 text-slate-300">
+                <strong className="text-blue-300 block">Tier 3: Nature 2026 / Science Skills</strong>
+                Benchmarks reconstructed from Avsec et al., <em>Nature</em> 2026 or Science Skill examples.
+              </div>
+              <div className="p-2.5 rounded bg-white/[0.02] border border-purple-500/30 text-slate-300">
+                <strong className="text-purple-300 block">Tier 4: Authoritative Genomic Reference</strong>
+                GRCh38 coordinates, MANE Select models, and ClinVar phenotypes.
+              </div>
+              <div className="p-2.5 rounded bg-white/[0.02] border border-rose-500/30 text-slate-300 sm:col-span-2">
+                <strong className="text-rose-300 block">Tier 5: Illustrative Educational Data</strong>
+                Explicitly labeled educational visualizations (e.g. flat negative controls). Never masquerades as raw output.
+              </div>
+            </div>
+          </div>
+
+          {/* Section 6: Citations and Links */}
           <div className="pt-2 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-400 gap-3">
             <div>
               <strong>Benchmark Reference:</strong> Avsec, Ž., Latysheva, N., Cheng, J. et al. <em>Advancing regulatory variant effect prediction with AlphaGenome.</em> Nature 649, 1206–1218 (2026).

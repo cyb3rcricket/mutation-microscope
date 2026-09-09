@@ -26,10 +26,17 @@ export const ObservatoryCanvas: React.FC = () => {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
+    // Check system preference for reduced motion
+    const motionMediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let isReducedMotion = motionMediaQuery.matches;
+
     const handleResize = () => {
       if (!canvas) return;
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
+      if (isReducedMotion) {
+        renderStatic();
+      }
     };
 
     window.addEventListener('resize', handleResize);
@@ -37,7 +44,10 @@ export const ObservatoryCanvas: React.FC = () => {
     // Subtle particle colors representing base pairs and genomic signals
     const colors = ['#22d3ee', '#34d399', '#38bdf8', '#818cf8', '#a855f7'];
 
-    const particleCount = Math.min(50, Math.floor((width * height) / 25000));
+    const particleCount = isReducedMotion
+      ? Math.min(20, Math.floor((width * height) / 50000))
+      : Math.min(50, Math.floor((width * height) / 25000));
+
     const particles: Particle[] = [];
 
     for (let i = 0; i < particleCount; i++) {
@@ -54,10 +64,7 @@ export const ObservatoryCanvas: React.FC = () => {
       });
     }
 
-    const render = () => {
-      ctx.clearRect(0, 0, width, height);
-
-      // Draw faint background grid lines (genomic coordinate grid feel)
+    const drawGrid = () => {
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.015)';
       ctx.lineWidth = 1;
 
@@ -75,6 +82,28 @@ export const ObservatoryCanvas: React.FC = () => {
         ctx.lineTo(width, y);
         ctx.stroke();
       }
+    };
+
+    // Static render for reduced-motion users (no continuous requestAnimationFrame loop)
+    const renderStatic = () => {
+      ctx.clearRect(0, 0, width, height);
+      drawGrid();
+
+      // Render fixed subtle celestial points
+      for (const p of particles) {
+        ctx.fillStyle = p.baseColor;
+        ctx.globalAlpha = 0.2;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    // Animated render for users who permit motion
+    const renderAnimated = () => {
+      ctx.clearRect(0, 0, width, height);
+      drawGrid();
 
       // Update and draw particles
       for (let i = 0; i < particles.length; i++) {
@@ -118,13 +147,30 @@ export const ObservatoryCanvas: React.FC = () => {
       }
 
       ctx.globalAlpha = 1;
-      animationFrameId = requestAnimationFrame(render);
+      animationFrameId = requestAnimationFrame(renderAnimated);
     };
 
-    render();
+    const handleMotionChange = (e: MediaQueryListEvent) => {
+      isReducedMotion = e.matches;
+      if (isReducedMotion) {
+        cancelAnimationFrame(animationFrameId);
+        renderStatic();
+      } else {
+        renderAnimated();
+      }
+    };
+
+    motionMediaQuery.addEventListener('change', handleMotionChange);
+
+    if (isReducedMotion) {
+      renderStatic();
+    } else {
+      renderAnimated();
+    }
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      motionMediaQuery.removeEventListener('change', handleMotionChange);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);

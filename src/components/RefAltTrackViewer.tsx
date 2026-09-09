@@ -90,11 +90,20 @@ export const RefAltTrackViewer: React.FC<RefAltTrackViewerProps> = ({
             <Activity className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-white tracking-wide flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-white tracking-wide flex items-center gap-2 flex-wrap">
               <span>Genome Signal Tracks & Sashimi Viewer</span>
               <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-white/[0.05] text-cyan-300">
                 {activeModality.name}
               </span>
+              {activeModality.tracks.provenance?.isIllustrative ? (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                  ⚠️ Illustrative Track
+                </span>
+              ) : activeModality.tracks.provenance ? (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
+                  ✓ Verified Track
+                </span>
+              ) : null}
             </h3>
           </div>
         </div>
@@ -409,6 +418,26 @@ export const RefAltTrackViewer: React.FC<RefAltTrackViewerProps> = ({
               </div>
             </div>
 
+            {/* Track Provenance & Downsampling Information */}
+            {activeModality.tracks.provenance && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 py-2 bg-obsidian-950/60 rounded-xl border border-white/5 text-[11px] text-slate-400 gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-slate-500 font-mono text-[10px] uppercase">Track Source:</span>
+                  <span className="text-slate-300 font-medium">{activeModality.tracks.provenance.source}</span>
+                  {activeModality.tracks.provenance.transformation && (
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 bg-white/[0.04] rounded text-slate-400 border border-white/5">
+                      {activeModality.tracks.provenance.transformation}
+                    </span>
+                  )}
+                </div>
+                {activeModality.tracks.provenance.displayPointCount && activeModality.tracks.provenance.originalPointCount && (
+                  <span className="text-[10px] font-mono text-slate-500">
+                    Resolution: {activeModality.tracks.provenance.displayPointCount} display / {activeModality.tracks.provenance.originalPointCount.toLocaleString()} original points
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Qualitative Assay Signal Descriptions */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs pt-1">
               <div className="bg-blue-950/20 border border-blue-500/20 rounded-xl p-3">
@@ -435,8 +464,15 @@ export const RefAltTrackViewer: React.FC<RefAltTrackViewerProps> = ({
         {/* SPLICING SASHIMI PLOT VIEW */}
         {viewTab === 'sashimi' && variant.sashimi && (
           <div className="space-y-5 animate-fadeIn">
-            <div className="text-xs text-slate-300 leading-relaxed">
-              <strong>Sashimi Arc Analysis:</strong> Arcs illustrate predicted RNA-seq junction reads connecting donor and acceptor splice boundaries. A shift in arc geometry reveals cryptic splice site activation or exon skipping.
+            <div className="text-xs text-slate-300 leading-relaxed flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <strong>Sashimi Arc Analysis:</strong> Arcs illustrate predicted splice junction signals connecting donor and acceptor splice boundaries. A shift in arc geometry reveals cryptic splice site activation or exon skipping.
+              </div>
+              {variant.sashimi.provenance?.isIllustrative && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/10 text-amber-300 border border-amber-500/30 shrink-0">
+                  ⚠️ Illustrative Visualization
+                </span>
+              )}
             </div>
 
             {/* SVG Sashimi Graphic */}
@@ -518,8 +554,12 @@ export const RefAltTrackViewer: React.FC<RefAltTrackViewerProps> = ({
                   const arcHeight = span > 1 ? 120 : 75;
                   const apexY = 175 - arcHeight;
 
-                  const isRefActive = junc.refReads > 0;
-                  const isAltActive = junc.altReads > 0;
+                  const refSig = junc.refSignal ?? junc.refReads;
+                  const altSig = junc.altSignal ?? junc.altReads;
+                  const isRefActive = refSig > 0;
+                  const isAltActive = altSig > 0;
+                  const activeSignal = currentAllele === 'REF' ? refSig : altSig;
+                  const unit = junc.signalUnit || 'signal';
 
                   return (
                     <g key={junc.id} className="transition-all duration-300">
@@ -538,7 +578,7 @@ export const RefAltTrackViewer: React.FC<RefAltTrackViewerProps> = ({
                           junc.isCryptic || junc.isSkipped ? '3.5' : '2.5'
                         }
                         strokeDasharray={
-                          junc.altReads === 0 ? '5 3' : 'none'
+                          altSig === 0 ? '5 3' : 'none'
                         }
                         opacity={
                           (currentAllele === 'REF' && isRefActive) ||
@@ -568,9 +608,7 @@ export const RefAltTrackViewer: React.FC<RefAltTrackViewerProps> = ({
                           textAnchor="middle"
                           className="text-[10px] font-mono font-bold fill-white select-none"
                         >
-                          {currentAllele === 'REF'
-                            ? `${junc.refReads} reads (REF)`
-                            : `${junc.altReads} reads (ALT)`}
+                          {`${activeSignal} ${unit} (${currentAllele})`}
                         </text>
                       </g>
                     </g>
@@ -581,9 +619,16 @@ export const RefAltTrackViewer: React.FC<RefAltTrackViewerProps> = ({
 
             {/* Junction Details Table */}
             <div className="space-y-2">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Sashimi Junction Quantification
-              </h4>
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Predicted Splice Junction Quantification
+                </h4>
+                {variant.sashimi.provenance && (
+                  <span className="text-[10px] font-mono text-slate-400">
+                    Source: {variant.sashimi.provenance.source}
+                  </span>
+                )}
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                 {variant.sashimi.junctions.map((j) => (
                   <div
@@ -596,8 +641,8 @@ export const RefAltTrackViewer: React.FC<RefAltTrackViewerProps> = ({
                   >
                     <div className="font-semibold text-white mb-1">{j.label}</div>
                     <div className="flex items-center justify-between font-mono text-[11px] text-slate-300">
-                      <span>REF: <strong className="text-blue-300">{j.refReads} reads</strong></span>
-                      <span>ALT: <strong className="text-rose-300">{j.altReads} reads</strong></span>
+                      <span>REF: <strong className="text-blue-300">{j.refSignal ?? j.refReads} {j.signalUnit || 'signal'}</strong></span>
+                      <span>ALT: <strong className="text-rose-300">{j.altSignal ?? j.altReads} {j.signalUnit || 'signal'}</strong></span>
                     </div>
                     <div className="text-[10px] text-slate-400 mt-1 font-mono">
                       Coordinates: {j.startCoord.toLocaleString()} → {j.endCoord.toLocaleString()}

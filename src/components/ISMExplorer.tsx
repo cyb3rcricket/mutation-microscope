@@ -49,11 +49,20 @@ export const ISMExplorer: React.FC<ISMExplorerProps> = ({
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-white tracking-wide flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-white tracking-wide flex items-center gap-2 flex-wrap">
               <span>In Silico Mutagenesis (ISM) & Motif Logo</span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">
                 {ism.targetMotif}
               </span>
+              {ism.provenance?.isIllustrative ? (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                  ⚠️ Illustrative Matrix
+                </span>
+              ) : ism.provenance ? (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30" title={ism.provenance.source}>
+                  ✓ Verified ISM Benchmark
+                </span>
+              ) : null}
             </h3>
             <p className="text-xs text-slate-400">
               Systematic in silico perturbation testing all 4 possible nucleotides across the regulatory motif
@@ -160,6 +169,13 @@ export const ISMExplorer: React.FC<ISMExplorerProps> = ({
           Box with glow indicates the exact selected mutation ({refBase} → {altBase})
         </div>
       </div>
+
+      {ism.provenance && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-400 border-t border-white/5 pt-2.5 gap-1 font-mono">
+          <span>Source: <strong className="text-slate-300">{ism.provenance.source}</strong></span>
+          {ism.provenance.notes && <span className="text-slate-500">{ism.provenance.notes}</span>}
+        </div>
+      )}
     </div>
   );
 };

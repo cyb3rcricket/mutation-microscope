@@ -12,6 +12,40 @@ export type ModalityCategory =
   | 'polyadenylation'
   | 'control';
 
+export type ProvenanceSourceType =
+  | 'AlphaGenome API'
+  | 'AlphaGenome Atlas'
+  | 'AlphaGenome Nature Paper (Avsec et al., 2026)'
+  | 'AlphaGenome Skill Golden Example'
+  | 'Authoritative Genomic Reference (GRCh38 / GENCODE v46)'
+  | 'Derived / Transformed Data'
+  | 'Illustrative Educational Data';
+
+export interface ProvenanceRecord {
+  field?: string;
+  sourceType: ProvenanceSourceType;
+  source: string;
+  scorer?: string;
+  biosample?: string;
+  assembly?: string;
+  retrievedAt?: string;
+  notes?: string;
+  isIllustrative?: boolean;
+}
+
+export interface TrackProvenance {
+  sourceType: ProvenanceSourceType;
+  source: string;
+  scorer?: string;
+  biosample?: string;
+  originalPointCount?: number;
+  displayPointCount?: number;
+  transformation?: string;
+  retrievedAt?: string;
+  isIllustrative: boolean;
+  notes?: string;
+}
+
 export interface FlankingSequence {
   upstream: string;
   refBase: string;
@@ -56,6 +90,7 @@ export interface TrackDataPoints {
   refValues: number[];
   altValues: number[];
   deltaValues: number[];
+  provenance?: TrackProvenance;
 }
 
 export interface ModalityEffect {
@@ -72,6 +107,7 @@ export interface ModalityEffect {
   refSignalDesc: string;
   altSignalDesc: string;
   tracks: TrackDataPoints;
+  provenance?: ProvenanceRecord;
 }
 
 export interface SashimiExon {
@@ -89,17 +125,22 @@ export interface SashimiJunction {
   toExon: string;
   startCoord: number;
   endCoord: number;
-  refReads: number;
-  altReads: number;
+  refReads: number; // Retained for backward compatibility
+  altReads: number; // Retained for backward compatibility
+  refSignal?: number; // Scientific predicted signal
+  altSignal?: number; // Scientific predicted signal
+  signalUnit?: string; // e.g. "predicted junction signal"
   isCanonical: boolean;
   isCryptic?: boolean;
   isSkipped?: boolean;
   label: string;
+  provenance?: ProvenanceRecord;
 }
 
 export interface SashimiPlotData {
   exons: SashimiExon[];
   junctions: SashimiJunction[];
+  provenance?: ProvenanceRecord;
 }
 
 export interface TissueComparison {
@@ -111,6 +152,7 @@ export interface TissueComparison {
   isTopDiscovery: boolean;
   significanceText: string;
   contextNote: string;
+  provenance?: ProvenanceRecord;
 }
 
 export interface ISMData {
@@ -126,15 +168,39 @@ export interface ISMData {
     G: number[];
     T: number[];
   };
+  provenance?: ProvenanceRecord;
 }
 
 export interface AlphaGenomeVariantImpact {
-  compositeScore: number;
-  percentileRank: number;
+  isAviAvailable: boolean; // Explicit flag: true ONLY if genuine Atlas AVI exists
+  compositeScore?: number | null; // Null if AVI unavailable
+  percentileRank: number; // Scorer quantile percentile if AVI unavailable
   impactTier: ImpactTier;
   primaryModality: string;
   primaryTissue: string;
   explanation: string;
+  statusText?: string;
+  provenance?: ProvenanceRecord;
+}
+
+export interface AlphaGenomeScorerResult {
+  scorer: string;
+  rawScore: number;
+  quantileScore: number;
+  unit: string;
+  tissue: string;
+  biosampleOntology: string;
+  affectedGene: string;
+  provenance?: ProvenanceRecord;
+}
+
+export interface DatasetMetadata {
+  generatedAt: string;
+  alphaGenomeApiVersion: string;
+  genomeAssembly: 'GRCh38';
+  sourceMode: 'live_api' | 'verified_benchmark';
+  variantCount: number;
+  normalizationVersion: string;
 }
 
 export interface VariantData {
@@ -155,9 +221,12 @@ export interface VariantData {
   evidenceSource: string;
   assembly: 'GRCh38';
   avi: AlphaGenomeVariantImpact;
+  alphaGenomeScores?: AlphaGenomeScorerResult[];
   genomicRegion: GenomicRegionData;
   modalities: ModalityEffect[];
   sashimi?: SashimiPlotData;
   tissues: TissueComparison[];
   ism?: ISMData;
+  provenance: ProvenanceRecord[];
 }
+

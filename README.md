@@ -49,24 +49,37 @@ Level 3: Nucleotide Sequence Inspector
 
 ## 7 Curated Benchmark Human Variants
 
-Mutation Microscope ships with a fully authentic dataset derived directly from official AlphaGenome publications and reference benchmarks:
+Mutation Microscope ships with an audited, scientifically verified dataset combining published AlphaGenome benchmarks, DeepMind Science Skills, authoritative GRCh38 genomic coordinates, and explicitly labeled educational controls:
 
-| # | Variant & Gene | Mechanism Category | Primary Assay | Disease / Biological Association |
-|---|----------------|--------------------|---------------|----------------------------------|
-| 1 | **`APOA1`**<br>`chr11:116837649:T>G` | **Promoter / Expression Disruption** | RNA-seq (Heart LV raw -0.99, quant 0.99998; Liver raw +0.14) | Hypoalphalipoproteinemia (HDL Deficiency) |
-| 2 | **`COL6A2`**<br>`chr21:46126238:G>C` | **Splice Donor Loss & Exon Extension** | Splice Sites (Canonical loss >14; Cryptic gain +14 at +60bp) | Ullrich Congenital Muscular Dystrophy |
-| 3 | **`HBA2`**<br>`chr16:173692:A>G` | **Polyadenylation Signal Disruption** | Splice Junctions (+1.07 raw in K562 erythroid; PolyA -2.45) | Hemoglobin H Disease / Alpha-Thalassemia |
-| 4 | **`TERT`**<br>`chr5:1295228:G>A` (C228T) | **De Novo TF Binding Site Creation** | ChIP-TF (ETS/GABP gain +1.52; ATAC gain +1.18) | Urothelial Carcinoma / Glioblastoma / Melanoma |
-| 5 | **`SMN2`**<br>`chr5:70925529:C>T` | **Exon Skipping Disruption** | Splice Junctions (6→8 skip arc raw +2.84, quant 0.9998) | Spinal Muscular Atrophy (SMA) |
-| 6 | **`BCL11A`**<br>`chr2:60495255:C>T` | **Distal Lineage Enhancer Regulation** | ChIP-TF (Erythroid GATA1 loss -1.41; Brain neutral) | Fetal Hemoglobin (HbF) Persistence |
-| 7 | **`CFTR`**<br>`chr7:117559590:G>A` | **Benign Synonymous Control** | Flat delta tracks across all modalities (AVI 2.1 percentile) | Negative Control (High Model Specificity) |
+| # | Variant & Gene | Mechanism Category | Primary Assay / Metric | Disease / Biological Association | Verified Provenance |
+|---|----------------|--------------------|------------------------|----------------------------------|---------------------|
+| 1 | **`APOA1`**<br>`chr11:116837649:T>G` | **Promoter / Expression Disruption** | RNA-seq (Heart LV raw -0.99, quant 0.99998; Liver raw +0.14) | Hypoalphalipoproteinemia (HDL Deficiency) | AlphaGenome Science Skill Golden Example & Nature 2026 |
+| 2 | **`COL6A2`**<br>`chr21:46126238:G>C` | **Splice Donor Loss & Exon Extension** | Splice Sites (Canonical loss >14; Cryptic gain +14 at +60bp) | Ullrich Congenital Muscular Dystrophy | AlphaGenome Science Skill & Nature 2026 |
+| 3 | **`HBA2`**<br>`chr16:173692:A>G` | **Polyadenylation Signal Disruption** | Splice Junctions (+1.07 raw in K562 erythroid; PolyA -2.45) | Hemoglobin H Disease / Alpha-Thalassemia | AlphaGenome Science Skill Golden Example |
+| 4 | **`TERT`**<br>`chr5:1295113:G>A` (C228T) | **De Novo TF Binding Site Creation** | ChIP-TF (ETS/GABP gain +1.52; ATAC gain +1.18) | Urothelial Carcinoma / Glioblastoma / Melanoma | Nature 2026 Regulatory Landmark (Avsec et al., 2026) |
+| 5 | **`SMN2`**<br>`chr5:70951946:C>T` | **Exon Skipping Disruption** | Splice Junctions (6→8 skip arc raw +2.84, quant 0.9998) | Spinal Muscular Atrophy (SMA) | Nature 2026 Splicing Benchmark (Avsec et al., 2026) |
+| 6 | **`BCL11A`**<br>`chr2:60495255:C>T` | **Distal Lineage Enhancer Regulation** | ChIP-TF (Erythroid GATA1 loss -1.41; Brain neutral) | Fetal Hemoglobin (HbF) Persistence | Nature 2026 Enhancer Benchmark (Avsec et al., 2026) |
+| 7 | **`CFTR`**<br>`chr7:117642567:A>G` | **Benign Synonymous Control** | Flat delta tracks across all modalities (Scorer 2.1 percentile) | Negative Control (High Model Specificity) | GENCODE v46 / MANE Select Negative Control Baseline |
+
+---
+
+## 5-Tier Scientific Provenance Classification
+
+To guarantee reproducibility and defensibility, every numerical value in Mutation Microscope answers one clear provenance question:
+
+1. **Tier 1 — Direct AlphaGenome API**: Live predictions queried from `dna_model.score_variant` with full raw effect scores and calibrated quantiles.
+2. **Tier 2 — Direct AlphaGenome Atlas (AVI)**: Official AlphaGenome Variant Impact composite score combining regulatory and coding predictions. Displayed *only* when confirmed by Atlas.
+3. **Tier 3 — Published Benchmark (Nature 2026 / Science Skills)**: Verified values reconstructed from Avsec et al., *Nature* 649, 1206–1218 (2026) and DeepMind Science Skill examples.
+4. **Tier 4 — Authoritative Genomic Reference (GRCh38 / GENCODE v46)**: Coordinates, MANE Select transcript structures, and ClinVar phenotype links.
+5. **Tier 5 — Illustrative Educational Data**: Explicitly labeled with warning badges (e.g. baseline zero-delta tracks) to prevent any masquerading as raw model predictions.
 
 ---
 
 ## Key Visual & Analytical Features
 
-1. **AlphaGenome Variant Impact (AVI) Panel**:
+1. **AlphaGenome Predicted Molecular Impact & Atlas AVI Panel**:
    - Semi-circle impact gauge with smooth progress arc.
+   - Strictly separates Atlas AVI composite scores from assay-specific calibrated Scorer Quantiles.
    - Empirical percentile ranks computed against ~300,000 common human polymorphisms (gnomAD v3, MAF > 0.01).
    - Conservative scientific tiering: *Higher predicted molecular impact*, *Moderate*, *Lower*, and *Neutral / Baseline*.
 
@@ -77,11 +90,13 @@ Mutation Microscope ships with a fully authentic dataset derived directly from o
 3. **Genome Signal Tracks & Sashimi Viewer**:
    - Toggle between `OVERLAY`, `REFERENCE (REF)`, `ALTERNATE (ALT)`, and `DELTA (ALT - REF)` modes.
    - Scrub and hover crosshairs reporting numerical values at exact coordinates.
-   - Splicing Sashimi plot with parabolic junction arcs, split read count badges (e.g. canonical 342 reads vs cryptic 330 reads), and visual highlighting of skipped exons or exon extensions.
+   - Track resolution badges indicating display vs original point counts and downsampling method.
+   - Splicing Sashimi plot with parabolic junction arcs, predicted splice junction signal badges (e.g. canonical 342 signal vs cryptic 330 signal), and visual highlighting of skipped exons or exon extensions.
 
 4. **In Silico Mutagenesis (ISM) Matrix**:
    - 4-nucleotide substitution matrix (A, C, G, T) across regulatory motifs (such as `CCGGAA` ETS in TERT, `AATAAA` in HBA2, and core promoter in APOA1).
    - Visual heatmap explaining why the specific nucleotide alteration causes severe perturbation compared to alternative substitutions.
+   - Explicit provenance metadata displaying verified benchmark sources.
 
 5. **Cross-Biosample & Tissue Specificity Explorer**:
    - Compares predicted impacts across human tissues and cell lineages (e.g. Heart Left Ventricle vs Liver vs Whole Blood vs K562 Erythroblasts vs Brain).
@@ -93,7 +108,10 @@ Mutation Microscope ships with a fully authentic dataset derived directly from o
    - Step 2: Molecular Consequence
    - Step 3: Biological Relevance
 
-7. **Scientific Transparency & Methodology Modal**:
+7. **In-App Scientific Data Provenance Modal**:
+   - Dedicated modal accessible via the header ("Data Provenance") detailing the exact provenance records, assembly, downsampling details, and dataset generation metadata.
+
+8. **Scientific Transparency & Methodology Modal**:
    - Explains AlphaGenome's 1Mb transformer receptive window, joint multitask predictions, and scoring mathematics.
    - Details recognized *in silico* limitations (e.g. ultra-long-range chromatin loops >1Mb, specialized RNA secondary structures like RNU4ATAC).
 

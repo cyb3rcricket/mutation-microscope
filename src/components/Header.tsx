@@ -1,15 +1,17 @@
 import React from 'react';
-import { Microscope, ExternalLink, HelpCircle, Dna } from 'lucide-react';
+import { Microscope, ExternalLink, HelpCircle, Dna, FileCheck2 } from 'lucide-react';
 import { VariantData } from '../types/variant';
 
 interface HeaderProps {
   currentVariant: VariantData;
   onOpenTransparencyModal: () => void;
+  onOpenProvenanceModal: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   currentVariant,
   onOpenTransparencyModal,
+  onOpenProvenanceModal,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-obsidian-950/80 backdrop-blur-md">
@@ -45,6 +47,15 @@ export const Header: React.FC<HeaderProps> = ({
             <Dna className="w-3.5 h-3.5 text-dna-emerald" />
             <span>GRCh38</span>
           </div>
+
+          <button
+            onClick={onOpenProvenanceModal}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-xs font-medium text-emerald-300 transition-colors"
+            title="Inspect Scientific Data Provenance & Audit Trail"
+          >
+            <FileCheck2 className="w-3.5 h-3.5 text-dna-emerald" />
+            <span className="hidden sm:inline">Data Provenance</span>
+          </button>
 
           <button
             onClick={onOpenTransparencyModal}

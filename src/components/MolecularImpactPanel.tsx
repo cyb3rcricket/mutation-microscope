@@ -8,6 +8,7 @@ interface MolecularImpactPanelProps {
 
 export const MolecularImpactPanel: React.FC<MolecularImpactPanelProps> = ({ variant }) => {
   const { avi } = variant;
+  const isAvi = avi.isAviAvailable;
 
   const getTierColor = (tier: ImpactTier) => {
     switch (tier) {
@@ -74,14 +75,35 @@ export const MolecularImpactPanel: React.FC<MolecularImpactPanelProps> = ({ vari
           <div className="flex items-center space-x-2">
             <Award className="w-4 h-4 text-dna-cyan" />
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
-              AlphaGenome Variant Impact (AVI)
+              {isAvi ? 'AlphaGenome Variant Impact (AVI)' : 'AlphaGenome Predicted Molecular Impact'}
             </h3>
+            {!isAvi && (
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.06] text-amber-300 border border-amber-500/30">
+                Top Scorer Quantile
+              </span>
+            )}
           </div>
 
           <div className="group relative">
             <Info className="w-3.5 h-3.5 text-slate-400 hover:text-slate-200 cursor-help" />
-            <div className="absolute right-0 top-6 w-64 p-2.5 rounded-lg bg-obsidian-850 border border-white/20 text-[11px] text-slate-300 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
-              AlphaGenome Variant Impact prioritizes variants based on predicted molecular effects relative to ~300,000 common human variants in gnomAD.
+            <div className="absolute right-0 top-6 w-80 p-3 rounded-lg bg-obsidian-900 border border-white/20 text-[11px] text-slate-300 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 space-y-2">
+              <div className="font-semibold text-white border-b border-white/10 pb-1">
+                AlphaGenome Metric Hierarchy:
+              </div>
+              <div>
+                <strong className="text-cyan-300 font-mono">1. Scorer Raw Score:</strong> Direct modeled effect size for a specific assay (e.g., log2 fold-change in RNA-seq, or delta splice donor probability).
+              </div>
+              <div>
+                <strong className="text-emerald-300 font-mono">2. Scorer Quantile Score:</strong> Empirical calibration of that specific scorer against ~300,000 common human variants in gnomAD (e.g. 99.998th percentile).
+              </div>
+              <div>
+                <strong className="text-amber-300 font-mono">3. AlphaGenome Atlas AVI:</strong> The separate composite metric combining AlphaGenome regulatory predictions and AlphaMissense protein-altering scores into a unified prioritization rank.
+              </div>
+              {!isAvi && (
+                <div className="pt-1 text-amber-200/90 italic border-t border-white/10">
+                  Note: Composite Atlas AVI is not available for this variant; this panel displays the calibrated {avi.primaryModality} scorer quantile.
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -118,7 +140,7 @@ export const MolecularImpactPanel: React.FC<MolecularImpactPanelProps> = ({ vari
                 {avi.percentileRank.toFixed(1)}%
               </span>
               <span className="text-[10px] text-slate-400 uppercase font-mono tracking-wider mt-0.5">
-                Percentile
+                {isAvi ? 'AVI Percentile' : 'Scorer Quantile'}
               </span>
             </div>
           </div>
@@ -136,6 +158,12 @@ export const MolecularImpactPanel: React.FC<MolecularImpactPanelProps> = ({ vari
             <p className="text-xs text-slate-300 leading-relaxed">
               {avi.explanation}
             </p>
+
+            {avi.statusText && (
+              <p className="text-[11px] text-slate-400 font-mono italic">
+                {avi.statusText}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -143,7 +171,7 @@ export const MolecularImpactPanel: React.FC<MolecularImpactPanelProps> = ({ vari
       {/* Primary Modality and Target Tissue Callouts */}
       <div className="mt-4 pt-3 border-t border-white/5 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
         <div className="bg-white/[0.02] border border-white/5 rounded-lg p-2 flex items-center justify-between">
-          <span className="text-slate-400">Primary Modality:</span>
+          <span className="text-slate-400">Calibrated Scorer:</span>
           <span className="font-mono font-medium text-dna-cyan">{avi.primaryModality}</span>
         </div>
         <div className="bg-white/[0.02] border border-white/5 rounded-lg p-2 flex items-center justify-between">

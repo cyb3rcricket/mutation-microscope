@@ -14,6 +14,7 @@ import { ExplanationPanel } from './components/ExplanationPanel';
 import { TissueExplorer } from './components/TissueExplorer';
 import { ISMExplorer } from './components/ISMExplorer';
 import { TransparencyModal } from './components/TransparencyModal';
+import { DataProvenanceModal } from './components/DataProvenanceModal';
 import { Footer } from './components/Footer';
 
 export const App: React.FC = () => {
@@ -25,6 +26,7 @@ export const App: React.FC = () => {
   );
   const [alleleState, setAlleleState] = useState<'REF' | 'ALT'>('ALT');
   const [isTransparencyModalOpen, setIsTransparencyModalOpen] = useState<boolean>(false);
+  const [isProvenanceModalOpen, setIsProvenanceModalOpen] = useState<boolean>(false);
 
   // When variant changes, ensure active modality matches the new variant's modalities
   const handleSelectVariant = (newVariant: VariantData) => {
@@ -54,6 +56,7 @@ export const App: React.FC = () => {
         <Header
           currentVariant={selectedVariant}
           onOpenTransparencyModal={() => setIsTransparencyModalOpen(true)}
+          onOpenProvenanceModal={() => setIsProvenanceModalOpen(true)}
         />
 
         {/* Prominent Educational / Non-Diagnostic Disclaimer */}
@@ -129,6 +132,15 @@ export const App: React.FC = () => {
       <TransparencyModal
         isOpen={isTransparencyModalOpen}
         onClose={() => setIsTransparencyModalOpen(false)}
+      />
+
+      {/* Scientific Data Provenance & Verification Audit Modal */}
+      <DataProvenanceModal
+        isOpen={isProvenanceModalOpen}
+        onClose={() => setIsProvenanceModalOpen(false)}
+        variants={variants}
+        selectedVariant={selectedVariant}
+        onSelectVariant={handleSelectVariant}
       />
     </div>
   );
