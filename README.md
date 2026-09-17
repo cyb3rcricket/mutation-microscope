@@ -2,240 +2,157 @@
 
 **Interactive Multi-Scale Genomic Observatory for AlphaGenome Variant Effect Predictions**
 
-*One DNA letter → predicted molecular consequences*
+*An interactive genomic observatory for visualizing, exploring, and understanding Google DeepMind AlphaGenome regulatory variant effect predictions down to the single-nucleotide level in human genome GRCh38.*
 
-**[Live Demo →](https://mutation-microscope.vercel.app)**
+👉 [**Launch Live Demo: mutation-microscope.vercel.app**](https://mutation-microscope.vercel.app)
 
 [![CI](https://github.com/cyb3rcricket/mutation-microscope/actions/workflows/ci.yml/badge.svg)](https://github.com/cyb3rcricket/mutation-microscope/actions/workflows/ci.yml)
-[![DeepMind AlphaGenome](https://img.shields.io/badge/AlphaGenome-DeepMind-cyan.svg)](https://alphagenome.deepmind.google/)
+[![Architecture Guide](https://img.shields.io/badge/Architecture-docs%2FARCHITECTURE.md-cyan.svg)](docs/ARCHITECTURE.md)
+[![Provenance Framework](https://img.shields.io/badge/Provenance-6--Class%20System-indigo.svg)](docs/PROVENANCE.md)
+[![DeepMind AlphaGenome](https://img.shields.io/badge/AlphaGenome-DeepMind-cyan.svg)](https://deepmind.google.com/science/alphagenome/)
 [![Genome Assembly](https://img.shields.io/badge/Assembly-GRCh38%20%2F%20hg38-emerald.svg)](https://www.ncbi.nlm.nih.gov/grc/human)
 [![Nature 2026](https://img.shields.io/badge/Nature-10.1038%2Fs41586--025--10014--0-blue.svg)](https://doi.org/10.1038/s41586-025-10014-0)
-[![License Notice](https://img.shields.io/badge/License-AlphaGenome%20Terms-amber.svg)](.licenses/alphagenome_single_variant_analysis_LICENSE.txt)
 
 ---
 
-## Overview
-
-**Mutation Microscope** is an interactive educational and scientific demonstration application designed to bridge the conceptual gap between single-nucleotide DNA variants and their multimodal molecular mechanisms.
-
-Built upon **Google DeepMind's AlphaGenome foundation model** (Avsec et al., *Nature* 2026), the application demonstrates how changing a single nucleotide in the human genome alters gene transcription (RNA-seq), RNA splicing junctions (Sashimi arcs), chromatin accessibility (DNase/ATAC), transcription factor binding (ChIP-TF), and polyadenylation cleavage (PAS).
-
-> [!IMPORTANT]
-> **Scientific Research & Educational Tool Only**: Mutation Microscope provides *in silico* molecular predictions computed by AlphaGenome for educational exploration and research hypothesis generation. It is **never** intended for clinical diagnosis, patient triage, or medical treatment decisions.
+### Dashboard Preview
+![Mutation Microscope Preview](docs/assets/preview.png)
+*Interactive observatory dashboard demonstrating single-nucleotide variant effect visualization across chromosome, gene body, and sequence scales with comparative epigenomic tracks.*  
+*(Note: To update the dashboard preview graphic, place an exported screenshot at `docs/assets/preview.png`)*
 
 ---
 
-## 3-Level Multi-Scale Microscope
+## ⚡ What I Engineered vs. What AlphaGenome Is
 
-The application features a 3-level interactive zoom navigation:
+To evaluate this project accurately, it is essential to distinguish between the underlying biological foundation model and the software platform engineered in this repository:
 
-```
-Level 1: Chromosome Ideogram
-  ├── Interactive human chromosome scale (0 Mb to pter/qter)
-  ├── p-arm & q-arm cytoband shading & centromeric notch
-  └── Pulsing variant pin with genomic coordinate callouts
-
-Level 2: Genomic Region & Gene Body
-  ├── Gene architecture with coding & non-coding exons
-  ├── Transcription directionality arrows (sense '+' or antisense '-')
-  └── Regulatory landmarks (promoters, enhancers, polyA signals, splice junctions)
-
-Level 3: Nucleotide Sequence Inspector
-  ├── Exact GRCh38 flanking sequence
-  ├── Interactive 1-click REF ↔ ALT nucleotide switcher
-  ├── Color-coded bases: A (Emerald), C (Cyan), G (Amber), T (Rose)
-  ├── Animated nucleotide morphing transition
-  └── Watson-Crick complementary base-pairing strand (3' → 5')
-```
+| Dimension | Google DeepMind AlphaGenome (Foundation Model) | Mutation Microscope (What I Engineered) |
+| :--- | :--- | :--- |
+| **Role & Purpose** | Pre-trained 1Mb transformer predicting epigenomic tracks and variant effect scores directly from raw DNA sequences (*Nature* 2026). | Interactive multi-scale visualizer, comparative analysis workspace, and scientific provenance engine for applied AI genomics. |
+| **User Interface** | Model weights, official Python client (`alphagenome`), and exploratory web portal (AlphaGenome Atlas). | 3-level semantic zoom (Chromosome → Gene Body → Single-Base), REF vs ALT comparative tracks, real-time delta scrubbing, and Sashimi arc plots. |
+| **Data Provenance** | Model output matrices and scalar quantiles. | Radical 6-tier field-level scientific provenance system (`live_api`, `atlas`, `published_exact`, `derived`, `reconstructed`, `illustrative`) with in-app audit modals. |
+| **Runtime Model** | Compute-heavy deep learning inference requiring GPUs or authenticated gRPC endpoints. | **Zero-secret, offline-first client runtime** bundling curated benchmark variants into deterministic JSON artifacts running at 60 FPS in standard browsers. |
+| **Data Pipeline** | Raw API requests and evaluation scripts. | Modular, reproducible Python pipeline (`uv`) decoupling declarative benchmark records from compiler logic with strict schema validation gates. |
+| **Production Delivery** | Cloud API service. | Fully automated CI/CD lifecycle (lint, strict typecheck, 33 automated unit & user-flow tests, static edge deployment via Vercel). |
 
 ---
 
-## 7 Curated Benchmark Human Variants
+## 🎯 Core Technical Highlights
+
+1. **3-Level Multi-Scale Semantic Zoom**:
+   - **Level 1 (Chromosome Ideogram)**: Interactive chromosome tube (0 Mb to pter/qter) with p/q cytobands, centromeric notch, and pulsing variant locus markers.
+   - **Level 2 (Genomic Region & Gene Body)**: Exon-intron organization, transcription directionality, strand orientation, and regulatory landmark annotations.
+   - **Level 3 (Nucleotide Sequence Inspector)**: Exact GRCh38 flanking sequence, color-coded nucleotides (A/C/G/T), and 1-click REF ↔ ALT base morphing.
+
+2. **Synchronized REF vs ALT Comparative Tracks**:
+   - Simultaneous inspection of REFERENCE (wild-type) vs ALTERNATE (mutant) continuous genomic signals across 1Mb windows.
+   - Coordinated scrubbing crosshair reporting exact numerical signal values and delta (`ALT − REF`) at every genomic position.
+   - Dynamic Sashimi splicing viewer rendering predicted junction arcs and highlighting exon extension/skipping events.
+
+3. **In Silico Mutagenesis (ISM) Heatmaps**:
+   - 4-nucleotide substitution matrices (A, C, G, T) across regulatory motifs (e.g. ETS consensus in `TERT`, polyA signal in `HBA2`).
+   - Visual heatmap explaining why the specific observed mutation is uniquely disruptive compared to alternative base substitutions.
+
+4. **6-Class Scientific Provenance Framework**:
+   - Every score, coordinate, and track is explicitly audited into: `live_api`, `atlas`, `published_exact`, `derived`, `reconstructed`, or `illustrative` (see [docs/PROVENANCE.md](docs/PROVENANCE.md)).
+   - In-app Data Provenance modal providing complete audit trails for every field in the dataset.
+
+5. **Deterministic Offline Replay with Optional Live API Enrichment**:
+   - Fully functional and testable without credentials.
+   - Optional `--fetch-live` pipeline flag enriches variants using DeepMind's official gRPC API when `ALPHAGENOME_API_KEY` is provided, with automated fallback invariants.
+
+---
+
+## 🧬 7 Curated Benchmark Human Variants
 
 Mutation Microscope ships with an audited dataset of curated benchmark human variants combining published AlphaGenome benchmarks, DeepMind Science Skills, authoritative GRCh38 genomic coordinates, and explicitly labeled educational controls:
 
-| # | Variant & Gene | Mechanism Category | Primary Assay / Metric | Disease / Biological Association | Evidence / Reference Source |
-|---|----------------|--------------------|------------------------|----------------------------------|-----------------------------|
-| 1 | **`APOA1`**<br>`chr11:116837649:T>G` | **Promoter / Expression Disruption** | RNA-seq (Heart LV raw -0.99, quant 0.99998; Liver raw +0.14) | Hypoalphalipoproteinemia (HDL Deficiency) | AlphaGenome Science Skill Golden Example & Nature 2026 |
-| 2 | **`COL6A2`**<br>`chr21:46126238:G>C` | **Splice Donor Loss & Exon Extension** | Splice Sites (Canonical loss >14; Cryptic gain +14 at +60bp) | Ullrich Congenital Muscular Dystrophy | AlphaGenome Science Skill & Nature 2026 |
-| 3 | **`HBA2`**<br>`chr16:173692:A>G` | **Polyadenylation Signal Disruption** | Splice Junctions (+1.07 raw in K562 erythroid; PolyA -2.45) | Hemoglobin H Disease / Alpha-Thalassemia | AlphaGenome Science Skill Golden Example |
-| 4 | **`TERT`**<br>`chr5:1295113:G>A` (C228T) | **De Novo TF Binding Site Creation** | ChIP-TF (ETS/GABP gain +1.52; ATAC gain +1.18) | Urothelial Carcinoma / Glioblastoma / Melanoma | Nature 2026 Regulatory Landmark (Avsec et al., 2026) |
-| 5 | **`SMN2`**<br>`chr5:70951946:C>T` | **Exon Skipping Disruption** | Splice Junctions (6→8 skip arc raw +2.84, quant 0.9998) | Spinal Muscular Atrophy (SMA) | Nature 2026 Splicing Benchmark (Avsec et al., 2026) |
-| 6 | **`BCL11A`**<br>`chr2:60495255:C>T` | **Distal Lineage Enhancer Regulation** | ChIP-TF (Erythroid GATA1 loss -1.41; Brain neutral) | Fetal Hemoglobin (HbF) Persistence | Nature 2026 Enhancer Benchmark (Avsec et al., 2026) |
-| 7 | **`CFTR`**<br>`chr7:117642567:A>G` | **Benign Synonymous Control** | Flat delta tracks across all modalities (Scorer 2.1 percentile) | Negative Control (High Model Specificity) | GENCODE v46 / MANE Select Negative Control Baseline |
+| # | Variant & Gene | Mechanism Category | Primary Assay / Metric | Disease / Biological Association | Evidence Class |
+|---|----------------|--------------------|------------------------|----------------------------------|----------------|
+| 1 | **`APOA1`**<br>`chr11:116837649:T>G` | **Promoter / Expression Disruption** | RNA-seq (Heart LV raw -0.99, quant 0.99998; Liver raw +0.14) | Hypoalphalipoproteinemia (HDL Deficiency) | `derived` / `published_exact` |
+| 2 | **`COL6A2`**<br>`chr21:46126238:G>C` | **Splice Donor Loss & Exon Extension** | Splice Sites (Canonical loss >14; Cryptic gain +14 at +60bp) | Ullrich Congenital Muscular Dystrophy | `derived` / `published_exact` |
+| 3 | **`HBA2`**<br>`chr16:173692:A>G` | **Polyadenylation Signal Disruption** | Splice Junctions (+1.07 raw in K562 erythroid; PolyA -2.45) | Hemoglobin H Disease / Alpha-Thalassemia | `derived` / `published_exact` |
+| 4 | **`TERT`**<br>`chr5:1295113:G>A` (C228T) | **De Novo TF Binding Site Creation** | ChIP-TF (ETS/GABP gain +1.52; ATAC gain +1.18) | Urothelial Carcinoma / Glioblastoma / Melanoma | `derived` / `published_exact` |
+| 5 | **`SMN2`**<br>`chr5:70951946:C>T` | **Exon Skipping Disruption** | Splice Junctions (6→8 skip arc raw +2.84, quant 0.9998) | Spinal Muscular Atrophy (SMA) | `derived` / `published_exact` |
+| 6 | **`BCL11A`**<br>`chr2:60495255:C>T` | **Distal Lineage Enhancer Regulation** | ChIP-TF (Erythroid GATA1 loss -1.41; Brain neutral) | Fetal Hemoglobin (HbF) Persistence | `derived` / `published_exact` |
+| 7 | **`CFTR`**<br>`chr7:117642567:A>G` | **Benign Synonymous Control** | Flat delta tracks across all modalities (Scorer 2.1 percentile) | External Biological Negative Control | `illustrative` / `published_exact` |
 
 ---
 
-## Six Evidence Classes Scientific Provenance Framework
-
-Mutation Microscope classifies scientific data by how directly it can be traced to its original source. Every numerical value, coordinate, sequence, and functional prediction is categorized into one of six evidence classes (see [docs/PROVENANCE.md](docs/PROVENANCE.md)):
-
-1. **`live_api` — Direct AlphaGenome API Result**: Returned directly from an AlphaGenome API request (`dna_model.score_variant`) with programmatic retrieval metadata (source, scorer, biosample, retrievedAt).
-2. **`atlas` — AlphaGenome Atlas Result**: Returned directly from the AlphaGenome Atlas variant portal, such as confirmed Atlas-specific variant impact scores (AVI).
-3. **`published_exact` — Published Exact Reference**: Exact coordinates, sequences, or values explicitly reported in a cited publication, official AlphaGenome example, or authoritative genomic reference (e.g. GRCh38 coordinates, MANE Select transcript models, ClinVar).
-4. **`derived` — Derived / Transformed Data**: Calculated or transformed from traceable source values, such as ALT − REF deltas, quantile-to-percentile conversions, normalization, or deterministic downsampling (with documented transformation).
-5. **`reconstructed` — Reconstructed from Publication**: Approximated or recreated from published figures, plots, screenshots, or descriptions that do not provide exact displayed values directly. Reconstructed data may represent genuine published results, but displayed values are not claimed to be exact source values.
-6. **`illustrative` — Illustrative Educational Data**: Synthetic or intentionally constructed data used to explain a concept, demonstrate interface behavior, or provide educational negative controls (e.g. flat zero-delta baseline tracks). Never presented as direct model output.
-
-> [!NOTE]
-> **Important Distinction:** `reconstructed` and `illustrative` are distinct classes. Reconstructed data approximates published results, whereas illustrative data is intentionally synthetic. If a value cannot be demonstrated to be exact, it is not labeled as exact.
-
----
-
-## Key Visual & Analytical Features
-
-1. **AlphaGenome Predicted Molecular Impact & Atlas AVI Panel**:
-   - Semi-circle impact gauge with smooth progress arc.
-   - Strictly separates Atlas AVI composite scores from assay-specific calibrated Scorer Quantiles.
-   - Empirical percentile ranks computed against ~300,000 common human polymorphisms (gnomAD v3, MAF > 0.01).
-   - Conservative scientific tiering: *Higher predicted molecular impact*, *Moderate*, *Lower*, and *Neutral / Baseline*.
-
-2. **Multimodal Molecular Assays Explorer**:
-   - Interactive cards for gene expression (RNA-seq), splice sites, splice junctions, chromatin accessibility (DNase/ATAC), ChIP-TF binding, and polyadenylation (PAS).
-   - Real raw scores (e.g. `log2 FC`, `max |ALT - REF|`) and quantile scores saturating at ±0.99999.
-
-3. **Genome Signal Tracks & Sashimi Viewer**:
-   - Toggle between `OVERLAY`, `REFERENCE (REF)`, `ALTERNATE (ALT)`, and `DELTA (ALT - REF)` modes.
-   - Scrub and hover crosshairs reporting numerical values at exact coordinates.
-   - Track resolution badges indicating display vs original point counts and downsampling method.
-   - Splicing Sashimi plot with parabolic junction arcs, predicted splice junction signal badges (e.g. canonical 342 signal vs cryptic 330 signal), and visual highlighting of skipped exons or exon extensions.
-
-4. **In Silico Mutagenesis (ISM) Matrix**:
-   - 4-nucleotide substitution matrix (A, C, G, T) across regulatory motifs (such as `CCGGAA` ETS in TERT, `AATAAA` in HBA2, and core promoter in APOA1).
-   - Visual heatmap explaining why the specific nucleotide alteration causes severe perturbation compared to alternative substitutions.
-   - Explicit provenance metadata displaying verified benchmark sources.
-
-5. **Cross-Biosample & Tissue Specificity Explorer**:
-   - Compares predicted impacts across human tissues and cell lineages (e.g. Heart Left Ventricle vs Liver vs Whole Blood vs K562 Erythroblasts vs Brain).
-   - Ontological references with one-click copyable CURIEs (`UBERON:0002083`, `UBERON:0001114`, `EFO:0002067`).
-   - Distinguishes between **Top Discovery Hits** (unexpected high regulatory sensitivity) and **Disease Target Tissues**.
-
-6. **Plain-English 3-Step Causality Cascade**:
-   - Step 1: Sequence Alteration
-   - Step 2: Molecular Consequence
-   - Step 3: Biological Relevance
-
-7. **In-App Scientific Data Provenance Modal**:
-   - Dedicated modal accessible via the header ("Data Provenance") detailing the exact provenance records, assembly, downsampling details, and dataset generation metadata.
-
-8. **Scientific Transparency & Methodology Modal**:
-   - Explains AlphaGenome's 1Mb transformer receptive window, joint multitask predictions, and scoring mathematics.
-   - Details recognized *in silico* limitations (e.g. ultra-long-range chromatin loops >1Mb, specialized RNA secondary structures like RNU4ATAC).
-
----
-
-## Quick Start & Installation
+## 🛠️ Quick Start & Local Setup
 
 ### Prerequisites
-- **Node.js** v18+ (tested with Node v25.2.1 and npm 11.6.2)
-- **Python** 3.10+ and [`uv`](https://docs.astral.sh/uv/) (for running the dataset generation & verification pipeline)
+- **Node.js**: v18+ (tested on Node v20/v22) and `npm`
+- **Python**: 3.10+ and [`uv`](https://docs.astral.sh/uv/) (for dataset compilation and verification)
 
-### Setup
+### Installation
 ```bash
-# Clone or navigate to the repository
-cd "/Volumes/Backup Plus/GitHub/mutation-microscope"
+# 1. Clone repository
+git clone https://github.com/cyb3rcricket/mutation-microscope.git
+cd mutation-microscope
 
-# Install dependencies
+# 2. Install Node dependencies
 npm install
 
-# Start local development server
+# 3. Start local development server
 npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
 ```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## Data Generation Pipeline (`scripts/generate_dataset.py`)
+## 🧪 Verification & Test Suite
 
-The application comes pre-packaged with a provenance-tracked curated dataset in `src/data/variants.json`. From a clean clone, the Python pipeline is fully reproducible using [`uv`](https://docs.astral.sh/uv/):
-
-### 1. Environment Setup
-
-Sync Python dependencies into the local virtual environment:
+The repository enforces automated validation across the frontend, TypeScript types, and Python data pipelines:
 
 ```bash
-uv sync
-```
+# Run ESLint check
+npm run lint
 
-### 2. Verify and Compile Benchmark Dataset (Offline Mode)
+# Run TypeScript typecheck (strict mode)
+npm run typecheck
 
-Compiles and validates the 7 curated benchmark variants with zero external network dependencies:
+# Run Vitest test suite (33 tests: dataset integrity, components, user flows)
+npm test
 
-```bash
-uv run scripts/generate_dataset.py --verify
-```
-
-You can also run schema and integrity validation directly:
-
-```bash
+# Run dataset schema and provenance validation
 uv run scripts/validate_dataset.py
+
+# Recompile and verify static dataset artifacts
+uv run scripts/generate_dataset.py --verify
+
+# Build production bundle
+npm run build
 ```
 
-### 3. Query Live AlphaGenome API (Live Mode)
+---
 
-To query DeepMind's live AlphaGenome API (`score_variant` endpoint and Atlas client) to enrich variants with live scalar effect scores and calibrated quantiles:
+## 📡 Optional Live AlphaGenome API Enrichment
 
-1. Register for an official API key at [deepmind.google.com/science/alphagenome](https://deepmind.google.com/science/alphagenome/).
-2. Export your API key in your shell environment (see `.env.example` as a safe configuration template/reference):
+To query Google DeepMind's live AlphaGenome API endpoint (`score_variant`) and Atlas client:
 
-```bash
-export ALPHAGENOME_API_KEY="your_alphagenome_api_key_here"
-```
-
+1. Obtain an authorized API key from [deepmind.google.com/science/alphagenome](https://deepmind.google.com/science/alphagenome/).
+2. Export the key into your environment (see `.env.example`):
+   ```bash
+   export ALPHAGENOME_API_KEY="your_alphagenome_api_key_here"
+   ```
 3. Run the live query pipeline:
-
-```bash
-uv run scripts/generate_dataset.py --fetch-live
-```
-
-> [!IMPORTANT]
-> **Never commit credentials or API keys to version control.**
-> The `.env` file and `.env.*` files are explicitly ignored by `.gitignore`. Keep your `ALPHAGENOME_API_KEY` private and only commit `.env.example` with placeholder values.
-
-### Pipeline Modes & Provenance Semantics
-
-The pipeline explicitly distinguishes between offline benchmark data and live API queries to ensure transparent scientific provenance:
-
-1. **`verified_benchmark` Mode (offline default)**:
-   - Compiles the 7 curated benchmark variants derived from Avsec et al. (*Nature* 2026), science skill golden examples, and GRCh38 / GENCODE v46 authoritative references.
-   - All variants have `hasLiveApiData: false`, `liveVariantCount: 0`, and exactly zero `live_api` provenance records across the dataset.
-
-2. **`mixed` Mode (`--fetch-live`)**:
-   - When the live query pipeline runs (`uv run scripts/generate_dataset.py --fetch-live`), scalar variant scores are computed live by AlphaGenome's `dna_model.score_variant` endpoint.
-   - Because `score_variant` returns scalar predictions across selected variant scorers rather than continuous 1Mb genomic track arrays, live results and curated benchmark data coexist:
-     - **Live-Enriched Data (`evidenceClass: "live_api"`)**: The `alphaGenomeScores` array (live scalar effect scores, calibrated quantiles, biosample metadata) and the top calibrated impact ranking in `avi` are populated directly from the API response with full retrieval metadata (`source`, `scorer`, `biosample`, `retrievedAt`). Variants with successful queries have `hasLiveApiData: true`.
-     - **Curated Benchmark Data (`evidenceClass: "published_exact" | "reconstructed" | "derived" | "illustrative"`)**: Continuous 1Mb modality tracks (`m["tracks"]`), Sashimi plot junction arcs and exon coordinates, flanking genomic sequences, regulatory annotations, In Silico Mutagenesis (ISM) matrices, and biological negative controls (CFTR) remain curated benchmark data.
-     - **Track Provenance Invariant**: Continuous modality tracks are **never** classified as `live_api`.
-   - Resulting dataset metadata records `sourceMode: "mixed"` and tracks `liveVariantCount`.
-
-3. **Fallback Behavior for Failed / Empty Live Queries**:
-   - If an individual variant's live query fails (e.g. network interruption, API error, or empty tidy DataFrame), the pipeline performs an explicit, graceful fallback:
-     - `hasLiveApiData` is set to `false` for that variant.
-     - Curated benchmark values and original provenance classifications (`published_exact`, `derived`, `reconstructed`, `illustrative`) are preserved intact.
-     - No field on that variant is marked as `live_api`.
-     - An explicit fallback notice is logged to stdout: `Live query fallback for <variant>: preserving curated benchmark values with original provenance.`
+   ```bash
+   uv run scripts/generate_dataset.py --fetch-live
+   ```
+*Note: If the key is not set or queries fail, the pipeline automatically preserves the verified benchmark records without throwing unhandled exceptions.*
 
 ---
 
-## Tech Stack & Architecture
+## 🏛️ System Architecture
 
-- **Framework**: [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
-- **Bundler**: [Vite 5](https://vitejs.dev/)
-- **Styling**: [TailwindCSS 3](https://tailwindcss.com/) with custom dark obsidian observatory theme (`#05070B`, `#070A0F`, `#0B0F17`)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Background**: High-performance HTML5 Canvas particle constellation
-- **Accessibility**: Respects `prefers-reduced-motion` and keyboard navigation (← / → arrow keys to switch variants)
+For a comprehensive technical breakdown of data flow, state management, security boundaries, and CI/CD pipelines, read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+For complete rules and definitions regarding the 6-tier scientific provenance classification, read [`docs/PROVENANCE.md`](docs/PROVENANCE.md).
 
 ---
 
-## Citation & References
-
-If using this demonstration or AlphaGenome predictions, please cite the primary benchmark paper:
+## 📖 Citation & References
 
 ```bibtex
 @article{Avsec2026,
@@ -246,23 +163,13 @@ If using this demonstration or AlphaGenome predictions, please cite the primary 
   number    = {8099},
   pages     = {1206--1218},
   year      = {2026},
-  doi       = {10.1038/s41586-025-10014-0},
-  publisher = {Nature Publishing Group UK London}
+  doi       = {10.1038/s41586-025-10014-0}
 }
 ```
 
 ---
 
-## Scientific Provenance
+## ⚖️ License & Disclaimer
 
-Mutation Microscope distinguishes between direct AlphaGenome results, Atlas data, exact published values, derived data, reconstructed visualizations, and explicitly illustrative educational data.
-
-These evidence classes are used throughout the dataset and provenance UI so that reconstructed or synthetic values are not presented as direct model output.
-
-See [`docs/PROVENANCE.md`](docs/PROVENANCE.md) for the complete classification rules.
-
----
-
-## License & Terms of Service
-
-AlphaGenome and the AlphaGenome Atlas are trademarks and research technologies of Google DeepMind. See [.licenses/alphagenome_single_variant_analysis_LICENSE.txt](.licenses/alphagenome_single_variant_analysis_LICENSE.txt) for license terms.
+- **Scientific Disclaimer**: Mutation Microscope provides *in silico* molecular predictions computed by AlphaGenome for educational exploration and research hypothesis generation. It is **never** intended for clinical diagnosis, patient triage, or medical treatment decisions.
+- **Model Terms**: AlphaGenome and AlphaGenome Atlas are research technologies of Google DeepMind. See [.licenses/alphagenome_single_variant_analysis_LICENSE.txt](.licenses/alphagenome_single_variant_analysis_LICENSE.txt) for license terms.
