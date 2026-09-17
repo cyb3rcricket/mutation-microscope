@@ -4,6 +4,8 @@
 
 *One DNA letter → predicted molecular consequences*
 
+**[Live Demo →](https://mutation-microscope.vercel.app)**
+
 [![CI](https://github.com/cyb3rcricket/mutation-microscope/actions/workflows/ci.yml/badge.svg)](https://github.com/cyb3rcricket/mutation-microscope/actions/workflows/ci.yml)
 [![DeepMind AlphaGenome](https://img.shields.io/badge/AlphaGenome-DeepMind-cyan.svg)](https://alphagenome.deepmind.google/)
 [![Genome Assembly](https://img.shields.io/badge/Assembly-GRCh38%20%2F%20hg38-emerald.svg)](https://www.ncbi.nlm.nih.gov/grc/human)
