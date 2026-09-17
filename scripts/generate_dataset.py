@@ -9,10 +9,11 @@ Mutation Microscope with rigorous provenance tracking.
 Modes of Operation:
 1. Live Query Mode (--fetch-live, requires ALPHAGENOME_API_KEY):
    Directly queries DeepMind's AlphaGenome API (dna_client.create / score_variant)
-   and Atlas client (alphagenome.atlas) to retrieve genuine modality scores,
-   calibrated quantiles, and genomic tracks.
-   Actual returned scores are parsed via variant_scorers.tidy_scores and stored
-   into the final dataset with full retrieval provenance.
+   and Atlas client (alphagenome.atlas) to retrieve genuine scalar scorer results
+   and calibrated quantiles. Actual returned scores are parsed via
+   variant_scorers.tidy_scores and enrich alphaGenomeScores plus top impact metadata (AVI)
+   with full retrieval provenance, while visualization tracks, Sashimi data, ISM,
+   sequences, and other curated benchmark structures retain their original provenance.
 
    Usage:
      uv run scripts/generate_dataset.py --fetch-live
@@ -1780,8 +1781,9 @@ def fetch_live_alphagenome_data(api_key: str) -> List[Dict[str, Any]]:
     """
     Live query pipeline using official alphagenome Python SDK.
     Connects to DeepMind's gRPC endpoint, scores each variant, parses the returned
-    AnnData objects via variant_scorers.tidy_scores, and actually integrates the live
-    scores, biosamples, and quantiles into the resulting dataset.
+    AnnData objects via variant_scorers.tidy_scores, and integrates the live
+    scalar scores, biosamples, and quantiles to enrich alphaGenomeScores and AVI metadata.
+    Continuous tracks, Sashimi, ISM, and genomic regions retain their original benchmark provenance.
     """
     try:
         from alphagenome.models import dna_client, variant_scorers

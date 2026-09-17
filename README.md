@@ -149,7 +149,7 @@ npm run preview
 
 ## Data Generation Pipeline (`scripts/generate_dataset.py`)
 
-The application comes pre-packaged with verified dataset in `src/data/variants.json`. To re-verify or query the live AlphaGenome API using your own API key:
+The application comes pre-packaged with a provenance-tracked curated dataset in `src/data/variants.json`. To re-verify or query the live AlphaGenome API using your own API key:
 
 ```bash
 # 1. Verify and compile the benchmark dataset (offline mode):
