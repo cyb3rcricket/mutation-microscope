@@ -16,6 +16,7 @@
     "clinicalRelevance": "APOA1 encodes the primary protein constituent of high-density lipoprotein (HDL) particles. Promoter disruption impairs hepatic synthesis, predisposing to accelerated atherosclerosis.",
     "evidenceSource": "AlphaGenome Science Skill Reference Example & Nature 2026 (DOI: 10.1038/s41586-025-10014-0)",
     "assembly": "GRCh38",
+    "hasLiveApiData": false,
     "avi": {
       "isAviAvailable": false,
       "compositeScore": null,
@@ -424,6 +425,7 @@
     "clinicalRelevance": "In-frame insertion of 20 residues into the COL6A2 collagen chain disrupts triple-helix folding and extracellular matrix microfibril assembly, causing muscular dystrophy.",
     "evidenceSource": "AlphaGenome Benchmark & Nature 2026 (Avsec et al., DOI: 10.1038/s41586-025-10014-0)",
     "assembly": "GRCh38",
+    "hasLiveApiData": false,
     "avi": {
       "isAviAvailable": false,
       "compositeScore": null,
@@ -843,6 +845,7 @@
     "clinicalRelevance": "HBA2 encodes the alpha-globin chain of adult hemoglobin (HbA). Failure of polyadenylation produces unstable elongated transcripts, causing severe microcytic hypochromic anemia.",
     "evidenceSource": "AlphaGenome Polyadenylation Case Study & Nature 2026 (Avsec et al., DOI: 10.1038/s41586-025-10014-0)",
     "assembly": "GRCh38",
+    "hasLiveApiData": false,
     "avi": {
       "isAviAvailable": false,
       "compositeScore": null,
@@ -1225,6 +1228,7 @@
     "clinicalRelevance": "TERT is normally repressed in mature somatic tissues. The C228T promoter mutation allows GABP transcription factor recruitment, preventing telomere shortening and conferring cellular immortality.",
     "evidenceSource": "Nature 2026 Regulatory Landmark (Avsec et al., DOI: 10.1038/s41586-025-10014-0)",
     "assembly": "GRCh38",
+    "hasLiveApiData": false,
     "avi": {
       "isAviAvailable": false,
       "compositeScore": null,
@@ -1593,6 +1597,7 @@
     "clinicalRelevance": "In individuals with homozygous deletion of SMN1, the paralog SMN2 cannot fully compensate due to this single C>T transition, precipitating progressive motor neuron degeneration in SMA.",
     "evidenceSource": "AlphaGenome Splicing Benchmark & Nature 2026 (Avsec et al., DOI: 10.1038/s41586-025-10014-0)",
     "assembly": "GRCh38",
+    "hasLiveApiData": false,
     "avi": {
       "isAviAvailable": false,
       "compositeScore": null,
@@ -1914,6 +1919,7 @@
     "clinicalRelevance": "BCL11A is the master repressor of fetal gamma-globin. Enhancer disruption de-represses HbF, ameliorating sickle cell disease and beta-thalassemia (basis of CRISPR gene therapies like exagamglogene autotemcel).",
     "evidenceSource": "AlphaGenome Regulatory Benchmark & Nature 2026 (Avsec et al., DOI: 10.1038/s41586-025-10014-0)",
     "assembly": "GRCh38",
+    "hasLiveApiData": false,
     "avi": {
       "isAviAvailable": false,
       "compositeScore": null,
@@ -2187,6 +2193,7 @@
     "clinicalRelevance": "Serves as an essential negative control demonstrating model specificity and low false-positive rate on non-consequential human genomic variants.",
     "evidenceSource": "Authoritative Genomic Annotation (ClinVar & Ensembl MANE Select; Illustrative Control Profile)",
     "assembly": "GRCh38",
+    "hasLiveApiData": false,
     "avi": {
       "isAviAvailable": false,
       "compositeScore": null,

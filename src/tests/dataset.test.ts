@@ -199,15 +199,69 @@ describe('Mutation Microscope Dataset Integrity', () => {
     });
   });
 
-  it('validates dataset metadata.json generation properties', async () => {
+  it('validates dataset metadata.json generation properties and mixed mode support', async () => {
     const metadataModule = await import('../data/metadata.json');
     const metadata = metadataModule.default;
     expect(metadata).toBeDefined();
     expect(metadata.genomeAssembly).toBe('GRCh38');
     expect(metadata.variantCount).toBe(dataset.length);
     expect(metadata.generatedAt).toBeTruthy();
-    expect(['verified_benchmark', 'live_api']).toContain(metadata.sourceMode);
+    expect(['verified_benchmark', 'live_api', 'mixed']).toContain(metadata.sourceMode);
     expect(metadata.alphaGenomeApiVersion).toContain('Avsec et al., Nature 2026');
+    if ('liveVariantCount' in metadata) {
+      expect(metadata.liveVariantCount).toBeGreaterThanOrEqual(0);
+      expect(metadata.liveVariantCount).toBeLessThanOrEqual(dataset.length);
+    }
+  });
+
+  it('verifies offline benchmark dataset has verified_benchmark sourceMode, zero live_api records, and hasLiveApiData === false', async () => {
+    const metadataModule = await import('../data/metadata.json');
+    const metadata = metadataModule.default;
+    expect(metadata.sourceMode).toBe('verified_benchmark');
+    if ('liveVariantCount' in metadata) {
+      expect(metadata.liveVariantCount).toBe(0);
+    }
+
+    let liveApiRecordCount = 0;
+    dataset.forEach((v) => {
+      expect(v.hasLiveApiData).toBe(false);
+
+      v.provenance?.forEach((p) => {
+        if (p.evidenceClass === 'live_api') liveApiRecordCount++;
+      });
+      if (v.avi?.provenance?.evidenceClass === 'live_api') liveApiRecordCount++;
+
+      v.modalities.forEach((m) => {
+        if (m.provenance?.evidenceClass === 'live_api') liveApiRecordCount++;
+        if (m.tracks?.provenance?.evidenceClass === 'live_api') liveApiRecordCount++;
+      });
+
+      v.tissues.forEach((t) => {
+        if (t.provenance?.evidenceClass === 'live_api') liveApiRecordCount++;
+      });
+
+      if (v.sashimi?.provenance?.evidenceClass === 'live_api') liveApiRecordCount++;
+      v.sashimi?.junctions.forEach((j) => {
+        if (j.provenance?.evidenceClass === 'live_api') liveApiRecordCount++;
+      });
+
+      if (v.ism?.provenance?.evidenceClass === 'live_api') liveApiRecordCount++;
+
+      v.alphaGenomeScores?.forEach((s) => {
+        if (s.provenance?.evidenceClass === 'live_api') liveApiRecordCount++;
+      });
+    });
+
+    expect(liveApiRecordCount).toBe(0);
+  });
+
+  it('enforces that continuous modality track provenance is never classified as live_api', () => {
+    dataset.forEach((v) => {
+      v.modalities.forEach((m) => {
+        const trackProv = m.tracks.provenance;
+        expect(trackProv?.evidenceClass).not.toBe('live_api');
+      });
+    });
   });
 
   it('ensures downsampled tracks document original point counts and transformations', () => {

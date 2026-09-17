@@ -12,7 +12,7 @@ import {
   AlertTriangle,
   Calendar,
 } from 'lucide-react';
-import { VariantData, ProvenanceSourceType, EvidenceClass } from '../types/variant';
+import { VariantData, ProvenanceSourceType, EvidenceClass, DatasetMetadata } from '../types/variant';
 import metadataJson from '../data/metadata.json';
 
 interface DataProvenanceModalProps {
@@ -214,6 +214,54 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
 
                 <p className="text-xs text-slate-300">
                   <strong>Evidence Source:</strong> {selectedVariant.evidenceSource}
+                </p>
+              </div>
+
+              {/* Variant Provenance Status Badge / Card */}
+              <div
+                className={`p-3.5 rounded-xl border space-y-1.5 ${
+                  selectedVariant.hasLiveApiData
+                    ? 'bg-cyan-950/30 border-cyan-500/40 text-cyan-200'
+                    : 'bg-emerald-950/20 border-emerald-500/30 text-emerald-200'
+                }`}
+              >
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold font-mono border ${
+                        selectedVariant.hasLiveApiData
+                          ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                          : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                      }`}
+                    >
+                      {selectedVariant.hasLiveApiData ? (
+                        <>
+                          <Sparkles className="w-3 h-3" />
+                          <span>Live API Enriched</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>Curated Benchmark</span>
+                        </>
+                      )}
+                    </span>
+                    <span className="text-xs font-semibold text-white">
+                      {selectedVariant.hasLiveApiData
+                        ? 'Live Scorer Results Integrated'
+                        : 'Curated Benchmark Variant'}
+                    </span>
+                  </div>
+                  {selectedVariant.hasLiveApiData && (
+                    <span className="text-[11px] font-mono text-cyan-400">
+                      sourceMode: mixed
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {selectedVariant.hasLiveApiData
+                    ? 'In mixed source mode, scalar variant predictions (alphaGenomeScores and calibrated AVI percentile) were queried directly from the live AlphaGenome API, while continuous 1Mb genomic tracks, Sashimi splice arcs, and coordinates remain curated benchmark data.'
+                    : 'All values, tracks, and annotations for this variant are derived from official AlphaGenome publications (Avsec et al., Nature 2026), science skill golden examples, and GRCh38 authoritative references.'}
                 </p>
               </div>
 
@@ -517,37 +565,122 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
           {/* TAB 3: DATASET GENERATION METADATA */}
           {activeTab === 'dataset' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div className="p-3 rounded-lg bg-obsidian-950 border border-white/5 space-y-1">
-                  <span className="text-slate-500 font-mono text-[10px] uppercase">Generated At</span>
-                  <div className="font-mono text-white font-semibold">{metadataJson.generatedAt}</div>
-                </div>
+              {(() => {
+                const metadata = metadataJson as DatasetMetadata;
+                return (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+                      <div className="p-3 rounded-lg bg-obsidian-950 border border-white/5 space-y-1">
+                        <span className="text-slate-500 font-mono text-[10px] uppercase">Generated At</span>
+                        <div className="font-mono text-white font-semibold truncate">{metadata.generatedAt}</div>
+                      </div>
 
-                <div className="p-3 rounded-lg bg-obsidian-950 border border-white/5 space-y-1">
-                  <span className="text-slate-500 font-mono text-[10px] uppercase">AlphaGenome Model Version</span>
-                  <div className="font-mono text-cyan-300 font-semibold">{metadataJson.alphaGenomeApiVersion}</div>
-                </div>
+                      <div className="p-3 rounded-lg bg-obsidian-950 border border-white/5 space-y-1">
+                        <span className="text-slate-500 font-mono text-[10px] uppercase">AlphaGenome Model Version</span>
+                        <div className="font-mono text-cyan-300 font-semibold">{metadata.alphaGenomeApiVersion}</div>
+                      </div>
 
-                <div className="p-3 rounded-lg bg-obsidian-950 border border-white/5 space-y-1">
-                  <span className="text-slate-500 font-mono text-[10px] uppercase">Genome Assembly</span>
-                  <div className="font-mono text-emerald-300 font-semibold">{metadataJson.genomeAssembly}</div>
-                </div>
+                      <div className="p-3 rounded-lg bg-obsidian-950 border border-white/5 space-y-1">
+                        <span className="text-slate-500 font-mono text-[10px] uppercase">Genome Assembly</span>
+                        <div className="font-mono text-emerald-300 font-semibold">{metadata.genomeAssembly}</div>
+                      </div>
 
-                <div className="p-3 rounded-lg bg-obsidian-950 border border-white/5 space-y-1">
-                  <span className="text-slate-500 font-mono text-[10px] uppercase">Source Mode</span>
-                  <div className="font-mono text-amber-300 font-semibold">{metadataJson.sourceMode}</div>
-                </div>
+                      <div className="p-3 rounded-lg bg-obsidian-950 border border-white/5 space-y-1">
+                        <span className="text-slate-500 font-mono text-[10px] uppercase">Source Mode</span>
+                        <div className="font-mono text-amber-300 font-semibold">{metadata.sourceMode}</div>
+                      </div>
 
-                <div className="p-3 rounded-lg bg-obsidian-950 border border-white/5 space-y-1">
-                  <span className="text-slate-500 font-mono text-[10px] uppercase">Curated Variant Count</span>
-                  <div className="font-mono text-white font-semibold">{metadataJson.variantCount} variants</div>
-                </div>
+                      <div className="p-3 rounded-lg bg-obsidian-950 border border-white/5 space-y-1">
+                        <span className="text-slate-500 font-mono text-[10px] uppercase">Curated Variant Count</span>
+                        <div className="font-mono text-white font-semibold">{metadata.variantCount} variants</div>
+                      </div>
 
-                <div className="p-3 rounded-lg bg-obsidian-950 border border-white/5 space-y-1">
-                  <span className="text-slate-500 font-mono text-[10px] uppercase">Normalization Version</span>
-                  <div className="font-mono text-white font-semibold">{metadataJson.normalizationVersion}</div>
-                </div>
-              </div>
+                      {metadata.liveVariantCount !== undefined && (
+                        <div className="p-3 rounded-lg bg-obsidian-950 border border-white/5 space-y-1">
+                          <span className="text-slate-500 font-mono text-[10px] uppercase">Live Variant Count</span>
+                          <div className="font-mono text-cyan-300 font-semibold">
+                            {metadata.liveVariantCount} / {metadata.variantCount} live enriched
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="p-3 rounded-lg bg-obsidian-950 border border-white/5 space-y-1">
+                        <span className="text-slate-500 font-mono text-[10px] uppercase">Normalization Version</span>
+                        <div className="font-mono text-white font-semibold">{metadata.normalizationVersion}</div>
+                      </div>
+                    </div>
+
+                    {/* Source Modes Explained */}
+                    <div className="p-4 rounded-xl bg-obsidian-950 border border-white/5 space-y-3">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                        <Info className="w-3.5 h-3.5 text-dna-cyan" />
+                        <span>Pipeline Source Modes</span>
+                      </h4>
+                      <div className="space-y-2.5 text-xs">
+                        <div
+                          className={`p-3 rounded-lg border ${
+                            metadata.sourceMode === 'mixed'
+                              ? 'bg-cyan-950/20 border-cyan-500/40 text-cyan-200'
+                              : 'bg-white/[0.02] border-white/5 text-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <strong className="font-mono text-cyan-300">mixed</strong>
+                            {metadata.sourceMode === 'mixed' && (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                                Active Mode
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-400">
+                            Coexistence of live AlphaGenome API predictions with curated benchmark data. Scalar model outputs (<code>alphaGenomeScores</code> and top calibrated impact in <code>avi</code>) are queried live from the API, while continuous 1Mb modality tracks, Sashimi splice junctions, and genomic coordinates remain curated benchmark data.
+                          </p>
+                        </div>
+
+                        <div
+                          className={`p-3 rounded-lg border ${
+                            metadata.sourceMode === 'verified_benchmark'
+                              ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-200'
+                              : 'bg-white/[0.02] border-white/5 text-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <strong className="font-mono text-emerald-300">verified_benchmark</strong>
+                            {metadata.sourceMode === 'verified_benchmark' && (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                                Active Mode
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-400">
+                            Completely offline curated benchmark dataset derived from official AlphaGenome benchmark publications (Avsec et al., Nature 2026), science skill golden examples, and GRCh38 / GENCODE v46 references. Contains zero live API records; all variants have <code>hasLiveApiData: false</code>.
+                          </p>
+                        </div>
+
+                        <div
+                          className={`p-3 rounded-lg border ${
+                            metadata.sourceMode === 'live_api'
+                              ? 'bg-blue-950/20 border-blue-500/40 text-blue-200'
+                              : 'bg-white/[0.02] border-white/5 text-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <strong className="font-mono text-blue-300">live_api</strong>
+                            {metadata.sourceMode === 'live_api' && (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-blue-500/20 text-blue-300 border border-blue-500/40">
+                                Active Mode
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-400">
+                            Full live API mode where all variant scores and assay predictions across all modalities are queried directly from live DeepMind AlphaGenome endpoints.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
 
               {/* Reproducibility Commands */}
               <div className="p-4 rounded-xl bg-obsidian-950 border border-white/5 space-y-2">

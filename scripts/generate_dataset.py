@@ -84,6 +84,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
             "clinicalRelevance": "APOA1 encodes the primary protein constituent of high-density lipoprotein (HDL) particles. Promoter disruption impairs hepatic synthesis, predisposing to accelerated atherosclerosis.",
             "evidenceSource": "AlphaGenome Science Skill Reference Example & Nature 2026 (DOI: 10.1038/s41586-025-10014-0)",
             "assembly": "GRCh38",
+            "hasLiveApiData": False,
             "avi": {
                 "isAviAvailable": False,
                 "compositeScore": None,
@@ -326,6 +327,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
             "clinicalRelevance": "In-frame insertion of 20 residues into the COL6A2 collagen chain disrupts triple-helix folding and extracellular matrix microfibril assembly, causing muscular dystrophy.",
             "evidenceSource": "AlphaGenome Benchmark & Nature 2026 (Avsec et al., DOI: 10.1038/s41586-025-10014-0)",
             "assembly": "GRCh38",
+            "hasLiveApiData": False,
             "avi": {
                 "isAviAvailable": False,
                 "compositeScore": None,
@@ -630,6 +632,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
             "clinicalRelevance": "HBA2 encodes the alpha-globin chain of adult hemoglobin (HbA). Failure of polyadenylation produces unstable elongated transcripts, causing severe microcytic hypochromic anemia.",
             "evidenceSource": "AlphaGenome Polyadenylation Case Study & Nature 2026 (Avsec et al., DOI: 10.1038/s41586-025-10014-0)",
             "assembly": "GRCh38",
+            "hasLiveApiData": False,
             "avi": {
                 "isAviAvailable": False,
                 "compositeScore": None,
@@ -870,6 +873,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
             "clinicalRelevance": "TERT is normally repressed in mature somatic tissues. The C228T promoter mutation allows GABP transcription factor recruitment, preventing telomere shortening and conferring cellular immortality.",
             "evidenceSource": "Nature 2026 Regulatory Landmark (Avsec et al., DOI: 10.1038/s41586-025-10014-0)",
             "assembly": "GRCh38",
+            "hasLiveApiData": False,
             "avi": {
                 "isAviAvailable": False,
                 "compositeScore": None,
@@ -1109,6 +1113,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
             "clinicalRelevance": "In individuals with homozygous deletion of SMN1, the paralog SMN2 cannot fully compensate due to this single C>T transition, precipitating progressive motor neuron degeneration in SMA.",
             "evidenceSource": "AlphaGenome Splicing Benchmark & Nature 2026 (Avsec et al., DOI: 10.1038/s41586-025-10014-0)",
             "assembly": "GRCh38",
+            "hasLiveApiData": False,
             "avi": {
                 "isAviAvailable": False,
                 "compositeScore": None,
@@ -1355,6 +1360,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
             "clinicalRelevance": "BCL11A is the master repressor of fetal gamma-globin. Enhancer disruption de-represses HbF, ameliorating sickle cell disease and beta-thalassemia (basis of CRISPR gene therapies like exagamglogene autotemcel).",
             "evidenceSource": "AlphaGenome Regulatory Benchmark & Nature 2026 (Avsec et al., DOI: 10.1038/s41586-025-10014-0)",
             "assembly": "GRCh38",
+            "hasLiveApiData": False,
             "avi": {
                 "isAviAvailable": False,
                 "compositeScore": None,
@@ -1571,6 +1577,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
             "clinicalRelevance": "Serves as an essential negative control demonstrating model specificity and low false-positive rate on non-consequential human genomic variants.",
             "evidenceSource": "Authoritative Genomic Annotation (ClinVar & Ensembl MANE Select; Illustrative Control Profile)",
             "assembly": "GRCh38",
+            "hasLiveApiData": False,
             "avi": {
                 "isAviAvailable": False,
                 "compositeScore": None,
@@ -1842,6 +1849,9 @@ def fetch_live_alphagenome_data(api_key: str) -> List[Dict[str, Any]]:
                 combined_df = pd.concat(parsed_dfs, ignore_index=True)
                 print(f"  -> Successfully parsed {len(combined_df)} live score records.")
 
+                # Mark variant as having live API data
+                v["hasLiveApiData"] = True
+
                 # Populate alphaGenomeScores on variant
                 live_scores: List[Dict[str, Any]] = []
                 for _, row in combined_df.iterrows():
@@ -1903,15 +1913,17 @@ def fetch_live_alphagenome_data(api_key: str) -> List[Dict[str, Any]]:
                     "source": "dna_model.score_variant",
                     "assembly": "GRCh38",
                     "retrievedAt": retrieval_timestamp,
-                    "notes": f"Successfully retrieved and integrated {len(live_scores)} live AlphaGenome scorer hits."
+                    "notes": "Live AlphaGenome API scorer predictions (continuous tracks and genomic coordinates remain curated benchmark data)."
                 })
 
             else:
-                print(f"  -> Notice: score_variant returned empty tidy DataFrame for {var_str}. Preserving benchmark data.")
+                v["hasLiveApiData"] = False
+                print(f"  -> Live query fallback for {var_str}: preserving curated benchmark values with original provenance.")
 
         except Exception as e:
+            v["hasLiveApiData"] = False
             print(f"  -> Live query note for {var_str}: {e}")
-            print(f"  -> Preserving curated benchmark values for {var_str}.")
+            print(f"  -> Live query fallback for {var_str}: preserving curated benchmark values with original provenance.")
 
         # Check Atlas AVI if client is available
         if atlas_client:
@@ -1937,7 +1949,6 @@ def main():
 
     api_key = os.environ.get("ALPHAGENOME_API_KEY")
 
-    source_mode = "verified_benchmark"
     if args.fetch_live:
         if not api_key:
             print("\nNotice: ALPHAGENOME_API_KEY is not set in environment.")
@@ -1945,10 +1956,15 @@ def main():
             print("Compiling verified benchmark dataset instead...")
             variants = get_curated_benchmark_variants()
         else:
-            source_mode = "live_api"
             variants = fetch_live_alphagenome_data(api_key)
     else:
         variants = get_curated_benchmark_variants()
+
+    live_count = sum(1 for v in variants if v.get("hasLiveApiData"))
+    if live_count > 0:
+        source_mode = "mixed"
+    else:
+        source_mode = "verified_benchmark"
 
     # Output formatted JSON (compatible as either array or object; frontend imports as array)
     OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -1963,6 +1979,7 @@ def main():
         "genomeAssembly": "GRCh38",
         "sourceMode": source_mode,
         "variantCount": len(variants),
+        "liveVariantCount": live_count,
         "normalizationVersion": "1.0.0"
     }
     with open(METADATA_FILE, "w", encoding="utf-8") as f:

@@ -163,6 +163,29 @@ uv run scripts/generate_dataset.py --fetch-live
 > [!NOTE]
 > Never commit your `ALPHAGENOME_API_KEY` to git or public repositories. Register for an official API key at [deepmind.google.com/science/alphagenome](https://deepmind.google.com/science/alphagenome/).
 
+### Pipeline Modes & Provenance Semantics
+
+The pipeline explicitly distinguishes between offline benchmark data and live API queries to ensure transparent scientific provenance:
+
+1. **`verified_benchmark` Mode (offline default)**:
+   - Compiles the 7 curated benchmark variants derived from Avsec et al. (*Nature* 2026), science skill golden examples, and GRCh38 / GENCODE v46 authoritative references.
+   - All variants have `hasLiveApiData: false`, `liveVariantCount: 0`, and exactly zero `live_api` provenance records across the dataset.
+
+2. **`mixed` Mode (`--fetch-live`)**:
+   - When the live query pipeline runs (`uv run scripts/generate_dataset.py --fetch-live`), scalar variant scores are computed live by AlphaGenome's `dna_model.score_variant` endpoint.
+   - Because `score_variant` returns scalar predictions across selected variant scorers rather than continuous 1Mb genomic track arrays, live results and curated benchmark data coexist:
+     - **Live-Enriched Data (`evidenceClass: "live_api"`)**: The `alphaGenomeScores` array (live scalar effect scores, calibrated quantiles, biosample metadata) and the top calibrated impact ranking in `avi` are populated directly from the API response with full retrieval metadata (`source`, `scorer`, `biosample`, `retrievedAt`). Variants with successful queries have `hasLiveApiData: true`.
+     - **Curated Benchmark Data (`evidenceClass: "published_exact" | "reconstructed" | "derived" | "illustrative"`)**: Continuous 1Mb modality tracks (`m["tracks"]`), Sashimi plot junction arcs and exon coordinates, flanking genomic sequences, regulatory annotations, In Silico Mutagenesis (ISM) matrices, and biological negative controls (CFTR) remain curated benchmark data.
+     - **Track Provenance Invariant**: Continuous modality tracks are **never** classified as `live_api`.
+   - Resulting dataset metadata records `sourceMode: "mixed"` and tracks `liveVariantCount`.
+
+3. **Fallback Behavior for Failed / Empty Live Queries**:
+   - If an individual variant's live query fails (e.g. network interruption, API error, or empty tidy DataFrame), the pipeline performs an explicit, graceful fallback:
+     - `hasLiveApiData` is set to `false` for that variant.
+     - Curated benchmark values and original provenance classifications (`published_exact`, `derived`, `reconstructed`, `illustrative`) are preserved intact.
+     - No field on that variant is marked as `live_api`.
+     - An explicit fallback notice is logged to stdout: `Live query fallback for <variant>: preserving curated benchmark values with original provenance.`
+
 ---
 
 ## Tech Stack & Architecture

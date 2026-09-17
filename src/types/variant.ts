@@ -210,8 +210,9 @@ export interface DatasetMetadata {
   generatedAt: string;
   alphaGenomeApiVersion: string;
   genomeAssembly: 'GRCh38';
-  sourceMode: 'live_api' | 'verified_benchmark';
+  sourceMode: 'live_api' | 'verified_benchmark' | 'mixed';
   variantCount: number;
+  liveVariantCount?: number;
   normalizationVersion: string;
 }
 
@@ -232,6 +233,7 @@ export interface VariantData {
   clinicalRelevance: string;
   evidenceSource: string;
   assembly: 'GRCh38';
+  hasLiveApiData?: boolean;
   avi: AlphaGenomeVariantImpact;
   alphaGenomeScores?: AlphaGenomeScorerResult[];
   genomicRegion: GenomicRegionData;

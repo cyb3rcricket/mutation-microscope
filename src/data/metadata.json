@@ -1,8 +1,9 @@
 {
-  "generatedAt": "2026-09-17T02:50:40.082990+00:00",
+  "generatedAt": "2026-09-17T03:06:45.583110+00:00",
   "alphaGenomeApiVersion": "1.0.0 (Avsec et al., Nature 2026)",
   "genomeAssembly": "GRCh38",
   "sourceMode": "verified_benchmark",
   "variantCount": 7,
+  "liveVariantCount": 0,
   "normalizationVersion": "1.0.0"
 }

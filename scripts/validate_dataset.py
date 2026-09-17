@@ -72,6 +72,57 @@ def validate_provenance_record(prov: Any, context: str, errors: List[str]) -> No
             errors.append(f"{context}: Record with isIllustrative: True must have evidenceClass 'illustrative', got '{ev_class}'")
 
 
+def collect_all_provenance_records(v: Dict[str, Any]) -> List[Any]:
+    """Collects all provenance records attached to a variant along with location paths."""
+    records = []
+
+    # Top-level provenance
+    for idx, p in enumerate(v.get("provenance", [])):
+        if isinstance(p, dict):
+            records.append((f"provenance[{idx}]", p))
+
+    # AVI provenance
+    avi_prov = v.get("avi", {}).get("provenance")
+    if isinstance(avi_prov, dict):
+        records.append(("avi.provenance", avi_prov))
+
+    # Modalities & tracks
+    for midx, m in enumerate(v.get("modalities", [])):
+        mid = m.get("id", str(midx))
+        if isinstance(m.get("provenance"), dict):
+            records.append((f"modalities[{mid}].provenance", m["provenance"]))
+        tprov = m.get("tracks", {}).get("provenance")
+        if isinstance(tprov, dict):
+            records.append((f"modalities[{mid}].tracks.provenance", tprov))
+
+    # Tissues
+    for tidx, t in enumerate(v.get("tissues", [])):
+        tname = t.get("name", str(tidx))
+        if isinstance(t.get("provenance"), dict):
+            records.append((f"tissues[{tname}].provenance", t["provenance"]))
+
+    # Sashimi
+    sashimi = v.get("sashimi")
+    if isinstance(sashimi, dict):
+        if isinstance(sashimi.get("provenance"), dict):
+            records.append(("sashimi.provenance", sashimi["provenance"]))
+        for jidx, j in enumerate(sashimi.get("junctions", [])):
+            jid = j.get("id", str(jidx))
+            if isinstance(j.get("provenance"), dict):
+                records.append((f"sashimi.junctions[{jid}].provenance", j["provenance"]))
+
+    # ISM
+    ism = v.get("ism")
+    if isinstance(ism, dict) and isinstance(ism.get("provenance"), dict):
+        records.append(("ism.provenance", ism["provenance"]))
+
+    # alphaGenomeScores
+    for sidx, s in enumerate(v.get("alphaGenomeScores", [])):
+        if isinstance(s.get("provenance"), dict):
+            records.append((f"alphaGenomeScores[{sidx}].provenance", s["provenance"]))
+
+    return records
+
 
 def validate_dataset(dataset_path: Path = DATASET_PATH) -> bool:
     print(f"Validating Mutation Microscope dataset: {dataset_path}")
@@ -83,9 +134,11 @@ def validate_dataset(dataset_path: Path = DATASET_PATH) -> bool:
         raw_data = json.load(f)
 
     # Allow either a top-level array or an object with metadata + variants
+    effective_metadata = None
     if isinstance(raw_data, dict):
         variants = raw_data.get("variants", [])
         metadata = raw_data.get("metadata", {})
+        effective_metadata = metadata
         print(f"Top-level metadata detected: {metadata.get('sourceMode', 'unknown')} mode, assembly {metadata.get('genomeAssembly')}")
     elif isinstance(raw_data, list):
         variants = raw_data
@@ -111,10 +164,16 @@ def validate_dataset(dataset_path: Path = DATASET_PATH) -> bool:
                 errors.append("[metadata.json] Missing 'generatedAt'")
             if mdata.get("genomeAssembly") != "GRCh38":
                 errors.append(f"[metadata.json] Invalid assembly: {mdata.get('genomeAssembly')}")
-            if mdata.get("sourceMode") not in ("live_api", "verified_benchmark"):
+            if mdata.get("sourceMode") not in ("live_api", "verified_benchmark", "mixed"):
                 errors.append(f"[metadata.json] Invalid sourceMode: {mdata.get('sourceMode')}")
             if mdata.get("variantCount") != len(variants):
                 errors.append(f"[metadata.json] variantCount {mdata.get('variantCount')} != len(variants) {len(variants)}")
+            if "liveVariantCount" in mdata:
+                lcount = mdata.get("liveVariantCount")
+                if not isinstance(lcount, int) or lcount < 0 or lcount > len(variants):
+                    errors.append(f"[metadata.json] Invalid liveVariantCount: {lcount}")
+            if effective_metadata is None:
+                effective_metadata = mdata
         except Exception as me:
             errors.append(f"[metadata.json] Failed to parse: {me}")
 
@@ -254,6 +313,8 @@ def validate_dataset(dataset_path: Path = DATASET_PATH) -> bool:
             else:
                 if "isIllustrative" not in tprov:
                     errors.append(f"[{vid}][{mid}] Track provenance missing 'isIllustrative' flag")
+                if tprov.get("evidenceClass") == "live_api":
+                    errors.append(f"[{vid}][{mid}] Modality tracks must never be classified as 'live_api' (continuous tracks remain curated benchmark data)")
                 validate_provenance_record(tprov, f"[{vid}][{mid} track provenance]", errors)
 
         # 7. Tissues Consistency
@@ -312,6 +373,67 @@ def validate_dataset(dataset_path: Path = DATASET_PATH) -> bool:
         for s_idx, s in enumerate(v.get("alphaGenomeScores", [])):
             if s.get("provenance"):
                 validate_provenance_record(s["provenance"], f"[{vid}][alphaGenomeScore #{s_idx} provenance]", errors)
+
+        # 12. Check hasLiveApiData consistency for this variant
+        has_live = v.get("hasLiveApiData", False)
+        if not isinstance(has_live, bool):
+            errors.append(f"[{vid}] 'hasLiveApiData' must be a boolean, got {type(has_live)}")
+
+        variant_records = collect_all_provenance_records(v)
+        if has_live:
+            # Must have live_api evidence in alphaGenomeScores
+            scores = v.get("alphaGenomeScores", [])
+            has_live_scores = any(
+                isinstance(s, dict)
+                and isinstance(s.get("provenance"), dict)
+                and s["provenance"].get("evidenceClass") == "live_api"
+                for s in scores
+            )
+            if not has_live_scores:
+                errors.append(f"[{vid}] hasLiveApiData is True, but alphaGenomeScores does not contain valid 'live_api' provenance records")
+        else:
+            # No live_api provenance allowed anywhere on this variant
+            for loc, prov in variant_records:
+                if prov.get("evidenceClass") == "live_api":
+                    errors.append(f"[{vid}] hasLiveApiData is False/absent, but found 'live_api' provenance at {loc}")
+
+    # Dataset-level provenance consistency rules
+    dataset_live_api_records = 0
+    dataset_benchmark_records = 0
+    dataset_live_variants = 0
+    benchmark_classes = {"published_exact", "reconstructed", "derived", "illustrative"}
+
+    for v in variants:
+        if v.get("hasLiveApiData") is True:
+            dataset_live_variants += 1
+        for _, prov in collect_all_provenance_records(v):
+            ev = prov.get("evidenceClass")
+            if ev == "live_api":
+                dataset_live_api_records += 1
+            elif ev in benchmark_classes:
+                dataset_benchmark_records += 1
+
+    if effective_metadata and "sourceMode" in effective_metadata:
+        sm = effective_metadata["sourceMode"]
+        if sm == "verified_benchmark":
+            if dataset_live_api_records > 0:
+                errors.append(f"sourceMode is 'verified_benchmark', but found {dataset_live_api_records} 'live_api' provenance record(s)")
+            if dataset_live_variants > 0:
+                errors.append(f"sourceMode is 'verified_benchmark', but found {dataset_live_variants} variant(s) with hasLiveApiData=True")
+            if "liveVariantCount" in effective_metadata and effective_metadata["liveVariantCount"] != 0:
+                errors.append(f"sourceMode is 'verified_benchmark', but liveVariantCount is {effective_metadata['liveVariantCount']} (expected 0)")
+        elif sm == "mixed":
+            if dataset_live_api_records == 0:
+                errors.append("sourceMode is 'mixed', but found 0 'live_api' records across dataset")
+            if dataset_benchmark_records == 0:
+                errors.append("sourceMode is 'mixed', but found 0 benchmark provenance records across dataset")
+            if dataset_live_variants == 0:
+                errors.append("sourceMode is 'mixed', but 0 variants have hasLiveApiData=True")
+            if "liveVariantCount" in effective_metadata and effective_metadata["liveVariantCount"] != dataset_live_variants:
+                errors.append(f"sourceMode is 'mixed', but liveVariantCount ({effective_metadata['liveVariantCount']}) != count of hasLiveApiData variants ({dataset_live_variants})")
+        elif sm == "live_api":
+            if dataset_live_api_records == 0:
+                errors.append("sourceMode is 'live_api', but found 0 'live_api' records across dataset")
 
     print("\n" + "=" * 70)
     print("VALIDATION REPORT:")
