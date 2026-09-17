@@ -230,3 +230,29 @@ export interface VariantData {
   provenance: ProvenanceRecord[];
 }
 
+export type EvidenceClass =
+  | 'live_api'
+  | 'atlas'
+  | 'published_exact'
+  | 'derived'
+  | 'reconstructed'
+  | 'illustrative';
+
+export interface ProvenanceRecord {
+  field?: string;
+  sourceType: ProvenanceSourceType;
+  evidenceClass: EvidenceClass;
+
+  source: string;
+  sourceLocator?: string;
+
+  scorer?: string;
+  biosample?: string;
+  assembly?: string;
+  retrievedAt?: string;
+
+  transformation?: string;
+  notes?: string;
+
+  isIllustrative?: boolean;
+}

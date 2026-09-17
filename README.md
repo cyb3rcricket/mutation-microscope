@@ -192,6 +192,16 @@ If using this demonstration or AlphaGenome predictions, please cite the primary 
 
 ---
 
+## Scientific Provenance
+
+Mutation Microscope distinguishes between direct AlphaGenome results, Atlas data, exact published values, derived data, reconstructed visualizations, and explicitly illustrative educational data.
+
+These evidence classes are used throughout the dataset and provenance UI so that reconstructed or synthetic values are not presented as direct model output.
+
+See [`docs/PROVENANCE.md`](docs/PROVENANCE.md) for the complete classification rules.
+
+---
+
 ## License & Terms of Service
 
 AlphaGenome and the AlphaGenome Atlas are trademarks and research technologies of Google DeepMind. See [.licenses/alphagenome_single_variant_analysis_LICENSE.txt](.licenses/alphagenome_single_variant_analysis_LICENSE.txt) for license terms.
