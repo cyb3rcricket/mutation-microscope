@@ -1949,6 +1949,12 @@ def main():
     parser.add_argument("--verify", action="store_true", help="Validate dataset schema and integrity without changing source")
     args = parser.parse_args()
 
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+
     api_key = os.environ.get("ALPHAGENOME_API_KEY")
 
     if args.fetch_live:

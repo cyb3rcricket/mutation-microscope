@@ -125,7 +125,7 @@ Mutation Microscope classifies scientific data by how directly it can be traced 
 
 ### Prerequisites
 - **Node.js** v18+ (tested with Node v25.2.1 and npm 11.6.2)
-- **Python** 3.9+ or `uv` (optional, for running the dataset generation pipeline)
+- **Python** 3.10+ and [`uv`](https://docs.astral.sh/uv/) (for running the dataset generation & verification pipeline)
 
 ### Setup
 ```bash
@@ -149,19 +149,55 @@ npm run preview
 
 ## Data Generation Pipeline (`scripts/generate_dataset.py`)
 
-The application comes pre-packaged with a provenance-tracked curated dataset in `src/data/variants.json`. To re-verify or query the live AlphaGenome API using your own API key:
+The application comes pre-packaged with a provenance-tracked curated dataset in `src/data/variants.json`. From a clean clone, the Python pipeline is fully reproducible using [`uv`](https://docs.astral.sh/uv/):
+
+### 1. Environment Setup
+
+Sync Python dependencies into the local virtual environment:
 
 ```bash
-# 1. Verify and compile the benchmark dataset (offline mode):
-python3 scripts/generate_dataset.py --verify
+uv sync
+```
 
-# 2. Query live AlphaGenome API (requires ALPHAGENOME_API_KEY in environment or ~/.env):
-export ALPHAGENOME_API_KEY="your-api-key-here"
+### 2. Verify and Compile Benchmark Dataset (Offline Mode)
+
+Compiles and validates the 7 curated benchmark variants with zero external network dependencies:
+
+```bash
+uv run scripts/generate_dataset.py --verify
+```
+
+You can also run schema and integrity validation directly:
+
+```bash
+uv run scripts/validate_dataset.py
+```
+
+### 3. Query Live AlphaGenome API (Live Mode)
+
+To query DeepMind's live AlphaGenome API (`score_variant` endpoint and Atlas client) to enrich variants with live scalar effect scores and calibrated quantiles:
+
+1. Register for an official API key at [deepmind.google.com/science/alphagenome](https://deepmind.google.com/science/alphagenome/).
+2. Configure your API key using either a `.env` file or an environment variable:
+
+```bash
+# Option A: Copy the template and add your API key (loaded automatically via python-dotenv)
+cp .env.example .env
+# Edit .env: ALPHAGENOME_API_KEY=your_alphagenome_api_key_here
+
+# Option B: Export directly into your shell environment
+export ALPHAGENOME_API_KEY="your_alphagenome_api_key_here"
+```
+
+3. Run the live query pipeline:
+
+```bash
 uv run scripts/generate_dataset.py --fetch-live
 ```
 
-> [!NOTE]
-> Never commit your `ALPHAGENOME_API_KEY` to git or public repositories. Register for an official API key at [deepmind.google.com/science/alphagenome](https://deepmind.google.com/science/alphagenome/).
+> [!IMPORTANT]
+> **Never commit credentials or API keys to version control.**
+> The `.env` file and `.env.*` files are explicitly ignored by `.gitignore`. Keep your `ALPHAGENOME_API_KEY` private and only commit `.env.example` with placeholder values.
 
 ### Pipeline Modes & Provenance Semantics
 
