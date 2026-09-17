@@ -49,10 +49,10 @@ Level 3: Nucleotide Sequence Inspector
 
 ## 7 Curated Benchmark Human Variants
 
-Mutation Microscope ships with an audited, scientifically verified dataset combining published AlphaGenome benchmarks, DeepMind Science Skills, authoritative GRCh38 genomic coordinates, and explicitly labeled educational controls:
+Mutation Microscope ships with an audited dataset of curated benchmark human variants combining published AlphaGenome benchmarks, DeepMind Science Skills, authoritative GRCh38 genomic coordinates, and explicitly labeled educational controls:
 
-| # | Variant & Gene | Mechanism Category | Primary Assay / Metric | Disease / Biological Association | Verified Provenance |
-|---|----------------|--------------------|------------------------|----------------------------------|---------------------|
+| # | Variant & Gene | Mechanism Category | Primary Assay / Metric | Disease / Biological Association | Evidence / Reference Source |
+|---|----------------|--------------------|------------------------|----------------------------------|-----------------------------|
 | 1 | **`APOA1`**<br>`chr11:116837649:T>G` | **Promoter / Expression Disruption** | RNA-seq (Heart LV raw -0.99, quant 0.99998; Liver raw +0.14) | Hypoalphalipoproteinemia (HDL Deficiency) | AlphaGenome Science Skill Golden Example & Nature 2026 |
 | 2 | **`COL6A2`**<br>`chr21:46126238:G>C` | **Splice Donor Loss & Exon Extension** | Splice Sites (Canonical loss >14; Cryptic gain +14 at +60bp) | Ullrich Congenital Muscular Dystrophy | AlphaGenome Science Skill & Nature 2026 |
 | 3 | **`HBA2`**<br>`chr16:173692:A>G` | **Polyadenylation Signal Disruption** | Splice Junctions (+1.07 raw in K562 erythroid; PolyA -2.45) | Hemoglobin H Disease / Alpha-Thalassemia | AlphaGenome Science Skill Golden Example |
@@ -63,15 +63,19 @@ Mutation Microscope ships with an audited, scientifically verified dataset combi
 
 ---
 
-## 5-Tier Scientific Provenance Classification
+## Six Evidence Classes Scientific Provenance Framework
 
-To guarantee reproducibility and defensibility, every numerical value in Mutation Microscope answers one clear provenance question:
+Mutation Microscope classifies scientific data by how directly it can be traced to its original source. Every numerical value, coordinate, sequence, and functional prediction is categorized into one of six evidence classes (see [docs/PROVENANCE.md](docs/PROVENANCE.md)):
 
-1. **Tier 1 — Direct AlphaGenome API**: Live predictions queried from `dna_model.score_variant` with full raw effect scores and calibrated quantiles.
-2. **Tier 2 — Direct AlphaGenome Atlas (AVI)**: Official AlphaGenome Variant Impact composite score combining regulatory and coding predictions. Displayed *only* when confirmed by Atlas.
-3. **Tier 3 — Published Benchmark (Nature 2026 / Science Skills)**: Verified values reconstructed from Avsec et al., *Nature* 649, 1206–1218 (2026) and DeepMind Science Skill examples.
-4. **Tier 4 — Authoritative Genomic Reference (GRCh38 / GENCODE v46)**: Coordinates, MANE Select transcript structures, and ClinVar phenotype links.
-5. **Tier 5 — Illustrative Educational Data**: Explicitly labeled with warning badges (e.g. baseline zero-delta tracks) to prevent any masquerading as raw model predictions.
+1. **`live_api` — Direct AlphaGenome API Result**: Returned directly from an AlphaGenome API request (`dna_model.score_variant`) with programmatic retrieval metadata (source, scorer, biosample, retrievedAt).
+2. **`atlas` — AlphaGenome Atlas Result**: Returned directly from the AlphaGenome Atlas variant portal, such as confirmed Atlas-specific variant impact scores (AVI).
+3. **`published_exact` — Published Exact Reference**: Exact coordinates, sequences, or values explicitly reported in a cited publication, official AlphaGenome example, or authoritative genomic reference (e.g. GRCh38 coordinates, MANE Select transcript models, ClinVar).
+4. **`derived` — Derived / Transformed Data**: Calculated or transformed from traceable source values, such as ALT − REF deltas, quantile-to-percentile conversions, normalization, or deterministic downsampling (with documented transformation).
+5. **`reconstructed` — Reconstructed from Publication**: Approximated or recreated from published figures, plots, screenshots, or descriptions that do not provide exact displayed values directly. Reconstructed data may represent genuine published results, but displayed values are not claimed to be exact source values.
+6. **`illustrative` — Illustrative Educational Data**: Synthetic or intentionally constructed data used to explain a concept, demonstrate interface behavior, or provide educational negative controls (e.g. flat zero-delta baseline tracks). Never presented as direct model output.
+
+> [!NOTE]
+> **Important Distinction:** `reconstructed` and `illustrative` are distinct classes. Reconstructed data approximates published results, whereas illustrative data is intentionally synthetic. If a value cannot be demonstrated to be exact, it is not labeled as exact.
 
 ---
 

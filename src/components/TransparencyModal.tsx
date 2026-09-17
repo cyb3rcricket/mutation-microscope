@@ -140,35 +140,39 @@ export const TransparencyModal: React.FC<TransparencyModalProps> = ({
             </ul>
           </div>
 
-          {/* Section 5: 5-Tier Provenance Classification */}
+          {/* Section 5: Six Evidence Classes Framework */}
           <div className="space-y-2 bg-obsidian-950/80 p-4 rounded-xl border border-white/5">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <Layers className="w-4 h-4 text-dna-cyan" />
-              <span>5. Transparent 5-Tier Data Provenance Framework</span>
+              <span>5. Six Evidence Classes Data Provenance Framework</span>
             </h3>
             <p className="text-xs text-slate-300">
-              Every datum in Mutation Microscope is audited and mapped to one of five verification categories:
+              Every scientific datum in Mutation Microscope is audited and classified into one of six evidence classes:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
               <div className="p-2.5 rounded bg-white/[0.02] border border-cyan-500/30 text-slate-300">
-                <strong className="text-cyan-300 block">Tier 1: AlphaGenome API</strong>
+                <strong className="text-cyan-300 block">1. Live API (<code>live_api</code>)</strong>
                 Live predictions queried directly from Google DeepMind's Python client.
               </div>
               <div className="p-2.5 rounded bg-white/[0.02] border border-indigo-500/30 text-slate-300">
-                <strong className="text-indigo-300 block">Tier 2: AlphaGenome Atlas</strong>
+                <strong className="text-indigo-300 block">2. AlphaGenome Atlas (<code>atlas</code>)</strong>
                 Official Atlas AVI composite impact scores and feature attributions.
               </div>
+              <div className="p-2.5 rounded bg-white/[0.02] border border-emerald-500/30 text-slate-300">
+                <strong className="text-emerald-300 block">3. Published Exact (<code>published_exact</code>)</strong>
+                Exact coordinates, sequences, or values explicitly reported in publications or authoritative references.
+              </div>
               <div className="p-2.5 rounded bg-white/[0.02] border border-blue-500/30 text-slate-300">
-                <strong className="text-blue-300 block">Tier 3: Nature 2026 / Science Skills</strong>
-                Benchmarks reconstructed from Avsec et al., <em>Nature</em> 2026 or Science Skill examples.
+                <strong className="text-blue-300 block">4. Derived (<code>derived</code>)</strong>
+                Calculated or transformed values (e.g. ALT − REF deltas, percentile ranks, downsampling).
               </div>
-              <div className="p-2.5 rounded bg-white/[0.02] border border-purple-500/30 text-slate-300">
-                <strong className="text-purple-300 block">Tier 4: Authoritative Genomic Reference</strong>
-                GRCh38 coordinates, MANE Select models, and ClinVar phenotypes.
+              <div className="p-2.5 rounded bg-white/[0.02] border border-amber-500/30 text-slate-300">
+                <strong className="text-amber-300 block">5. Reconstructed (<code>reconstructed</code>)</strong>
+                Approximated or recreated from published figures or plots; not claimed to be exact source values.
               </div>
-              <div className="p-2.5 rounded bg-white/[0.02] border border-rose-500/30 text-slate-300 sm:col-span-2">
-                <strong className="text-rose-300 block">Tier 5: Illustrative Educational Data</strong>
-                Explicitly labeled educational visualizations (e.g. flat negative controls). Never masquerades as raw output.
+              <div className="p-2.5 rounded bg-white/[0.02] border border-rose-500/30 text-slate-300">
+                <strong className="text-rose-300 block">6. Illustrative (<code>illustrative</code>)</strong>
+                Synthetic or educational controls (e.g. flat negative controls). Never presented as real output.
               </div>
             </div>
           </div>

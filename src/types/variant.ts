@@ -21,20 +21,32 @@ export type ProvenanceSourceType =
   | 'Derived / Transformed Data'
   | 'Illustrative Educational Data';
 
+export type EvidenceClass =
+  | 'live_api'
+  | 'atlas'
+  | 'published_exact'
+  | 'derived'
+  | 'reconstructed'
+  | 'illustrative';
+
 export interface ProvenanceRecord {
   field?: string;
   sourceType: ProvenanceSourceType;
+  evidenceClass: EvidenceClass;
   source: string;
+  sourceLocator?: string;
   scorer?: string;
   biosample?: string;
   assembly?: string;
   retrievedAt?: string;
+  transformation?: string;
   notes?: string;
   isIllustrative?: boolean;
 }
 
 export interface TrackProvenance {
   sourceType: ProvenanceSourceType;
+  evidenceClass: EvidenceClass;
   source: string;
   scorer?: string;
   biosample?: string;
@@ -228,31 +240,4 @@ export interface VariantData {
   tissues: TissueComparison[];
   ism?: ISMData;
   provenance: ProvenanceRecord[];
-}
-
-export type EvidenceClass =
-  | 'live_api'
-  | 'atlas'
-  | 'published_exact'
-  | 'derived'
-  | 'reconstructed'
-  | 'illustrative';
-
-export interface ProvenanceRecord {
-  field?: string;
-  sourceType: ProvenanceSourceType;
-  evidenceClass: EvidenceClass;
-
-  source: string;
-  sourceLocator?: string;
-
-  scorer?: string;
-  biosample?: string;
-  assembly?: string;
-  retrievedAt?: string;
-
-  transformation?: string;
-  notes?: string;
-
-  isIllustrative?: boolean;
 }

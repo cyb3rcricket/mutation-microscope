@@ -18,7 +18,7 @@ Modes of Operation:
      uv run scripts/generate_dataset.py --fetch-live
 
 2. Benchmark Export & Verification Mode (offline / default):
-   Exports the authentic, scientifically verified benchmark dataset derived from
+   Exports the curated benchmark dataset derived from
    official AlphaGenome benchmark publications (Avsec et al., Nature 2026),
    DeepMind science skill golden examples, and GENCODE v46 / GRCh38 annotations.
 
@@ -49,7 +49,7 @@ from validate_dataset import validate_dataset
 
 def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
     """
-    Returns the complete, authentic, scientifically validated dataset for the
+    Returns the curated benchmark dataset for the
     7 curated human variants in GRCh38.
 
     Every numerical value and sequence has been audited and classified:
@@ -95,11 +95,13 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 "explanation": "Top AlphaGenome Scorer Quantile: At the 99.998th percentile, this variant is in the top tier of predicted expression perturbations genome-wide for RNA-seq in cardiac tissue.",
                 "provenance": {
                     "sourceType": "AlphaGenome Skill Golden Example",
+                    "evidenceClass": "derived",
                     "source": "docs/examples/regulatory/apoa1_promoter/report.md",
                     "scorer": "RNA_SEQ",
                     "retrievedAt": "2026-09-09T00:00:00Z",
+                    "transformation": "Percentile rank converted from quantile score (0.99998 * 100)",
                     "isIllustrative": False,
-                    "notes": "Verified AlphaGenome variant scorer quantile (not Atlas AVI composite score)."
+                    "notes": "AlphaGenome variant scorer quantile converted to percentile rank (not Atlas AVI composite score)."
                 }
             },
             "genomicRegion": {
@@ -149,21 +151,24 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "deltaValues": [-2.1, -2.9, -3.0, -3.6, -3.9, -1.6, -0.1],
                         "provenance": {
                             "sourceType": "AlphaGenome Skill Golden Example",
+                            "evidenceClass": "reconstructed",
                             "source": "docs/examples/regulatory/apoa1_promoter/plot_heart_left_ventricle_APOA1_effects.png",
                             "scorer": "RNA_SEQ",
                             "biosample": "Heart Left Ventricle (UBERON:0002083)",
                             "originalPointCount": 16384,
                             "displayPointCount": 7,
-                            "transformation": "Systematically sampled from 1Mb AlphaGenome receptive field centered on promoter",
+                            "transformation": "Systematically sampled from 1Mb AlphaGenome receptive field centered on promoter in skill golden example figure",
                             "isIllustrative": False,
-                            "notes": "Verified profile reconstructed from AlphaGenome skill golden example."
+                            "notes": "Signal profile reconstructed from AlphaGenome skill golden example figure."
                         }
                     },
                     "provenance": {
                         "sourceType": "AlphaGenome Skill Golden Example",
+                        "evidenceClass": "published_exact",
                         "source": "docs/examples/regulatory/apoa1_promoter/report.md",
                         "scorer": "RNA_SEQ",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (-0.99) and quantile score (0.99998) reported in golden example report."
                     }
                 },
                 {
@@ -186,20 +191,24 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "deltaValues": [0.0, -0.2, -2.2, -4.3, -2.2, -0.2, 0.0],
                         "provenance": {
                             "sourceType": "AlphaGenome Skill Golden Example",
+                            "evidenceClass": "reconstructed",
                             "source": "docs/examples/regulatory/apoa1_promoter/plot_liver_APOA1_effects.png",
                             "scorer": "DNASE",
                             "biosample": "Liver (UBERON:0001114)",
                             "originalPointCount": 16384,
                             "displayPointCount": 7,
-                            "transformation": "Systematically sampled from 1Mb AlphaGenome receptive field centered on promoter",
-                            "isIllustrative": False
+                            "transformation": "Systematically sampled from 1Mb AlphaGenome receptive field centered on promoter in skill golden example figure",
+                            "isIllustrative": False,
+                            "notes": "Signal profile reconstructed from AlphaGenome skill golden example figure."
                         }
                     },
                     "provenance": {
                         "sourceType": "AlphaGenome Skill Golden Example",
+                        "evidenceClass": "published_exact",
                         "source": "docs/examples/regulatory/apoa1_promoter/report.md",
                         "scorer": "DNASE",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (-0.84) and quantile score (0.9992) reported in golden example report."
                     }
                 }
             ],
@@ -215,8 +224,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Strongest regulatory disruption signal in discovery scan; highlights high regulatory sensitivity of promoter.",
                     "provenance": {
                         "sourceType": "AlphaGenome Skill Golden Example",
+                        "evidenceClass": "published_exact",
                         "source": "docs/examples/regulatory/apoa1_promoter/report.md",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (-0.99) and quantile score (0.99998) reported in golden example report."
                     }
                 },
                 {
@@ -230,8 +241,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Primary site of physiological APOA1 synthesis; significant alteration in transcriptional balance drives hypoalphalipoproteinemia.",
                     "provenance": {
                         "sourceType": "AlphaGenome Skill Golden Example",
+                        "evidenceClass": "published_exact",
                         "source": "docs/examples/regulatory/apoa1_promoter/report.md",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (0.14) and quantile score (0.9990) reported in golden example report."
                     }
                 },
                 {
@@ -245,8 +258,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Minimal baseline expression in circulating leukocytes; model correctly predicts no perturbation.",
                     "provenance": {
                         "sourceType": "AlphaGenome Skill Golden Example",
+                        "evidenceClass": "published_exact",
                         "source": "docs/examples/regulatory/apoa1_promoter/report.md",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (-0.04) and quantile score (0.3120) reported in golden example report."
                     }
                 }
             ],
@@ -265,15 +280,18 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 },
                 "provenance": {
                     "sourceType": "AlphaGenome Skill Golden Example",
+                    "evidenceClass": "reconstructed",
                     "source": "docs/examples/regulatory/apoa1_promoter/ism_heart_left_ventricle_RNA_SEQ.png",
                     "isIllustrative": False,
-                    "notes": "Verified motif sensitivity matrix from AlphaGenome Science Skill ISM SeqLogo."
+                    "transformation": "Reconstructed from AlphaGenome Science Skill ISM SeqLogo heatmap figure",
+                    "notes": "Motif sensitivity matrix reconstructed from AlphaGenome Science Skill ISM SeqLogo figure."
                 }
             },
             "provenance": [
                 {
                     "field": "variant",
                     "sourceType": "Authoritative Genomic Reference (GRCh38 / GENCODE v46)",
+                    "evidenceClass": "published_exact",
                     "source": "GENCODE v46 / Ensembl MANE Select ENST00000236850.5",
                     "assembly": "GRCh38",
                     "notes": "chr11:116837649:T>G is located 27bp upstream of APOA1 TSS (116837622) on minus strand."
@@ -281,6 +299,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 {
                     "field": "scores",
                     "sourceType": "AlphaGenome Skill Golden Example",
+                    "evidenceClass": "published_exact",
                     "source": "AlphaGenome Single Variant Analysis skill, docs/examples/regulatory/apoa1_promoter/",
                     "notes": "Heart left ventricle raw=-0.99, quant=0.99998; liver raw=+0.14, quant=0.999."
                 }
@@ -318,11 +337,13 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 "explanation": "Top AlphaGenome Scorer Quantile: AlphaGenome predicts an extreme splicing rearrangement (Quantile > 0.99999) swapping canonical donor recognition for a downstream cryptic donor.",
                 "provenance": {
                     "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                    "evidenceClass": "derived",
                     "source": "Avsec et al. Nature 649, 1206-1218 (2026)",
                     "scorer": "SPLICE_SITES",
                     "retrievedAt": "2026-09-09T00:00:00Z",
+                    "transformation": "Percentile rank converted from quantile score (>0.99999 -> 99.999)",
                     "isIllustrative": False,
-                    "notes": "Verified published AlphaGenome splicing benchmark."
+                    "notes": "Published AlphaGenome splicing benchmark quantile converted to percentile rank."
                 }
             },
             "genomicRegion": {
@@ -371,20 +392,24 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "deltaValues": [0.0, -0.2, -14.08, -0.2, 0.2, 14.62, 0.01],
                         "provenance": {
                             "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                            "evidenceClass": "reconstructed",
                             "source": "Avsec et al. Nature 649, 1206-1218 (2026) / Science Skill splicing example",
                             "scorer": "SPLICE_SITES",
                             "biosample": "Aorta (UBERON:0000947)",
                             "originalPointCount": 16384,
                             "displayPointCount": 7,
-                            "transformation": "Sampled at donor and cryptic splice coordinates across exon-intron boundary",
-                            "isIllustrative": False
+                            "transformation": "Sampled at donor and cryptic splice coordinates across exon-intron boundary from published benchmark figure",
+                            "isIllustrative": False,
+                            "notes": "Signal points reconstructed and downsampled from Nature 2026 / Science Skill splicing example."
                         }
                     },
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 649, 1206-1218 (2026)",
                         "scorer": "SPLICE_SITES",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (14.82) and quantile score (0.99999) reported in Avsec et al. Nature 2026."
                     }
                 },
                 {
@@ -407,20 +432,24 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "deltaValues": [0.0, -13.3, 11.8, 14.1, 0.0, -0.3, 0.0],
                         "provenance": {
                             "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                            "evidenceClass": "reconstructed",
                             "source": "Avsec et al. Nature 649, 1206-1218 (2026) Figure 3",
                             "scorer": "SPLICE_JUNCTIONS",
                             "biosample": "Aorta (UBERON:0000947)",
                             "originalPointCount": 16384,
                             "displayPointCount": 7,
-                            "transformation": "Sampled at donor and cryptic splice coordinates",
-                            "isIllustrative": False
+                            "transformation": "Sampled at donor and cryptic splice coordinates from published Figure 3",
+                            "isIllustrative": False,
+                            "notes": "Signal points reconstructed from Avsec et al. Nature 2026 Figure 3."
                         }
                     },
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 649, 1206-1218 (2026)",
                         "scorer": "SPLICE_JUNCTIONS",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (3.91) and quantile score (0.99998) reported in Avsec et al. Nature 2026."
                     }
                 }
             ],
@@ -447,8 +476,11 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "label": "Exon 25 -> Exon 26 (Unchanged)",
                         "provenance": {
                             "sourceType": "AlphaGenome Skill Golden Example",
+                            "evidenceClass": "reconstructed",
                             "source": "docs/examples/splicing/col6a2_report.md",
-                            "isIllustrative": False
+                            "isIllustrative": False,
+                            "transformation": "Modeled junction signal estimated from col6a2_report.md",
+                            "notes": "Modeled junction flow reconstructed from col6a2_report.md."
                         }
                     },
                     {
@@ -466,8 +498,11 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "label": "Canonical Donor (46126238 -> 46126502)",
                         "provenance": {
                             "sourceType": "AlphaGenome Skill Golden Example",
+                            "evidenceClass": "reconstructed",
                             "source": "docs/examples/splicing/col6a2_report.md",
-                            "isIllustrative": False
+                            "isIllustrative": False,
+                            "transformation": "Canonical junction signal estimated from col6a2_report.md",
+                            "notes": "Canonical junction flow reconstructed from col6a2_report.md."
                         }
                     },
                     {
@@ -486,15 +521,20 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "label": "Cryptic Donor (+60bp: 46126298 -> 46126502)",
                         "provenance": {
                             "sourceType": "AlphaGenome Skill Golden Example",
+                            "evidenceClass": "reconstructed",
                             "source": "docs/examples/splicing/col6a2_report.md",
-                            "isIllustrative": False
+                            "isIllustrative": False,
+                            "transformation": "Cryptic junction signal estimated from col6a2_report.md",
+                            "notes": "Cryptic junction flow reconstructed from col6a2_report.md."
                         }
                     }
                 ],
                 "provenance": {
                     "sourceType": "AlphaGenome Skill Golden Example",
+                    "evidenceClass": "reconstructed",
                     "source": "docs/examples/splicing/col6a2_report.md",
                     "isIllustrative": False,
+                    "transformation": "Relative junction flows estimated from splicing model output",
                     "notes": "Modeled junction abundance values representing relative predicted junction flows, not wet-lab read counts."
                 }
             },
@@ -510,8 +550,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Robust collagen synthesis tissue; extreme confidence in cryptic splice activation.",
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (14.82) and quantile score (0.99999) from Avsec et al. Nature 2026."
                     }
                 },
                 {
@@ -525,8 +567,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Primary pathology site for congenital muscular dystrophy; complete splice disruption predicted.",
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (14.15) and quantile score (0.99999) from Avsec et al. Nature 2026."
                     }
                 },
                 {
@@ -540,8 +584,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Consistently reproduces the 60bp exon extension across all connective and vascular tissues.",
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (13.98) and quantile score (0.99999) from Avsec et al. Nature 2026."
                     }
                 }
             ],
@@ -549,6 +595,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 {
                     "field": "variant",
                     "sourceType": "Authoritative Genomic Reference (GRCh38 / GENCODE v46)",
+                    "evidenceClass": "published_exact",
                     "source": "GENCODE v46 / Ensembl MANE Select ENST00000300527.9",
                     "assembly": "GRCh38",
                     "notes": "chr21:46126238 is the canonical donor +1 position of COL6A2 exon 26."
@@ -556,6 +603,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 {
                     "field": "splicing_scores",
                     "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                    "evidenceClass": "published_exact",
                     "source": "Avsec et al. Nature 649, 1206-1218 (2026)",
                     "notes": "Published case study for cryptic donor activation and 60bp in-frame exon extension."
                 }
@@ -593,10 +641,13 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 "explanation": "Top AlphaGenome Scorer Quantile: High Splice Junction score (+1.07) in a 3' UTR variant signals aberrant 3' transcript processing and failure of transcriptional termination.",
                 "provenance": {
                     "sourceType": "AlphaGenome Skill Golden Example",
+                    "evidenceClass": "derived",
                     "source": "docs/examples/polyadenylation_HBA2/report.md",
                     "scorer": "SPLICE_JUNCTIONS",
                     "retrievedAt": "2026-09-09T00:00:00Z",
-                    "isIllustrative": False
+                    "transformation": "Percentile rank converted from quantile score (0.9984 * 100)",
+                    "isIllustrative": False,
+                    "notes": "AlphaGenome variant scorer quantile converted to percentile rank (not Atlas AVI composite score)."
                 }
             },
             "genomicRegion": {
@@ -644,20 +695,24 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "deltaValues": [0.0, -0.1, -0.1, 2.8, 5.4, 3.3, 1.75],
                         "provenance": {
                             "sourceType": "AlphaGenome Skill Golden Example",
+                            "evidenceClass": "reconstructed",
                             "source": "docs/examples/polyadenylation_HBA2/plot_K562_HBA2_effects.png",
                             "scorer": "SPLICE_JUNCTIONS",
                             "biosample": "K562 (EFO:0002067)",
                             "originalPointCount": 16384,
                             "displayPointCount": 7,
-                            "transformation": "Sampled across 3' UTR termination boundary",
-                            "isIllustrative": False
+                            "transformation": "Sampled across 3' UTR termination boundary from golden example plot",
+                            "isIllustrative": False,
+                            "notes": "Signal points reconstructed from golden example plot."
                         }
                     },
                     "provenance": {
                         "sourceType": "AlphaGenome Skill Golden Example",
+                        "evidenceClass": "published_exact",
                         "source": "docs/examples/polyadenylation_HBA2/report.md",
                         "scorer": "SPLICE_JUNCTIONS",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (1.07) and quantile score (0.9984) reported in golden example report."
                     }
                 },
                 {
@@ -680,20 +735,24 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "deltaValues": [-0.1, -0.6, -8.8, -5.3, -0.4, 0.2, 0.3],
                         "provenance": {
                             "sourceType": "AlphaGenome Skill Golden Example",
+                            "evidenceClass": "reconstructed",
                             "source": "docs/examples/polyadenylation_HBA2/report.md",
                             "scorer": "POLYADENYLATION",
                             "biosample": "K562 (EFO:0002067)",
                             "originalPointCount": 16384,
                             "displayPointCount": 7,
-                            "transformation": "Sampled around the polyA signal hexamer",
-                            "isIllustrative": False
+                            "transformation": "Sampled around the polyA signal hexamer from report figures",
+                            "isIllustrative": False,
+                            "notes": "Signal points reconstructed from golden example report."
                         }
                     },
                     "provenance": {
                         "sourceType": "AlphaGenome Skill Golden Example",
+                        "evidenceClass": "published_exact",
                         "source": "docs/examples/polyadenylation_HBA2/report.md",
                         "scorer": "POLYADENYLATION",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (-2.45) and quantile score (0.9996) reported in golden example report."
                     }
                 }
             ],
@@ -709,8 +768,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Erythroid lineage expressing high levels of globin; demonstrates profound polyA failure.",
                     "provenance": {
                         "sourceType": "AlphaGenome Skill Golden Example",
+                        "evidenceClass": "published_exact",
                         "source": "docs/examples/polyadenylation_HBA2/report.md",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (1.07) and quantile score (0.9984) from report.md."
                     }
                 },
                 {
@@ -724,8 +785,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Primary hematopoietic compartment; aberrant globin mRNA processing impairs erythropoiesis.",
                     "provenance": {
                         "sourceType": "AlphaGenome Skill Golden Example",
+                        "evidenceClass": "published_exact",
                         "source": "docs/examples/polyadenylation_HBA2/report.md",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (0.92) and quantile score (0.9972) from report.md."
                     }
                 },
                 {
@@ -739,8 +802,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Absence of globin transcription yields zero aberrant processing signal.",
                     "provenance": {
                         "sourceType": "AlphaGenome Skill Golden Example",
+                        "evidenceClass": "published_exact",
                         "source": "docs/examples/polyadenylation_HBA2/report.md",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (0.02) and quantile score (0.1800) from report.md."
                     }
                 }
             ],
@@ -759,15 +824,18 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 },
                 "provenance": {
                     "sourceType": "AlphaGenome Skill Golden Example",
+                    "evidenceClass": "reconstructed",
                     "source": "docs/examples/polyadenylation_HBA2/ism_K562_RNA_SEQ.png",
                     "isIllustrative": False,
-                    "notes": "Verified ISM motif score 2.45 confirming destruction of AATAAA hexamer."
+                    "transformation": "Reconstructed from AlphaGenome Science Skill ISM SeqLogo figure (ism_K562_RNA_SEQ.png)",
+                    "notes": "ISM motif scores reconstructed from published ISM figure."
                 }
             },
             "provenance": [
                 {
                     "field": "variant",
                     "sourceType": "Authoritative Genomic Reference (GRCh38 / GENCODE v46)",
+                    "evidenceClass": "published_exact",
                     "source": "GENCODE v46 / Ensembl MANE Select ENST00000251595.11",
                     "assembly": "GRCh38",
                     "notes": "chr16:173692 is inside the canonical AATAAA hexamer in the HBA2 3' UTR."
@@ -775,6 +843,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 {
                     "field": "scores",
                     "sourceType": "AlphaGenome Skill Golden Example",
+                    "evidenceClass": "published_exact",
                     "source": "docs/examples/polyadenylation_HBA2/report.md",
                     "notes": "Splice junction read-through score +1.07 (quant=0.998)."
                 }
@@ -812,10 +881,13 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 "explanation": "Top AlphaGenome Scorer Quantile: Predicted de novo ETS transcription factor docking site accompanied by significant gain in chromatin accessibility (ATAC) and promoter initiation.",
                 "provenance": {
                     "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                    "evidenceClass": "derived",
                     "source": "Avsec et al. Nature 649, 1206-1218 (2026)",
                     "scorer": "CHIP_TF",
                     "retrievedAt": "2026-09-09T00:00:00Z",
-                    "isIllustrative": False
+                    "transformation": "Percentile rank converted from quantile score (0.99996 * 100)",
+                    "isIllustrative": False,
+                    "notes": "AlphaGenome variant scorer quantile converted to percentile rank (not Atlas AVI composite score)."
                 }
             },
             "genomicRegion": {
@@ -862,20 +934,24 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "deltaValues": [0.1, 1.25, 7.63, 1.92, 0.28, 0.07, 0.1],
                         "provenance": {
                             "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                            "evidenceClass": "reconstructed",
                             "source": "Avsec et al. Nature 649, 1206-1218 (2026) Regulatory Benchmark",
                             "scorer": "CHIP_TF",
                             "biosample": "Epithelial (UBERON:0000083)",
                             "originalPointCount": 16384,
                             "displayPointCount": 7,
-                            "transformation": "Sampled across core promoter ETS hotspot locus",
-                            "isIllustrative": False
+                            "transformation": "Sampled across core promoter ETS hotspot locus from published figures",
+                            "isIllustrative": False,
+                            "notes": "Signal points reconstructed from Avsec et al. Nature 2026."
                         }
                     },
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
                         "scorer": "CHIP_TF",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (1.52) and quantile score (0.99996) reported in Avsec et al. Nature 2026."
                     }
                 },
                 {
@@ -898,20 +974,24 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "deltaValues": [0.1, 0.8, 3.7, 2.2, 1.5, 0.1],
                         "provenance": {
                             "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                            "evidenceClass": "reconstructed",
                             "source": "Avsec et al. Nature 649, 1206-1218 (2026)",
                             "scorer": "DNASE",
                             "biosample": "Epithelial Cell (CL:0000066)",
                             "originalPointCount": 16384,
                             "displayPointCount": 6,
-                            "transformation": "Sampled across promoter chromatin envelope",
-                            "isIllustrative": False
+                            "transformation": "Sampled across promoter chromatin envelope from published figures",
+                            "isIllustrative": False,
+                            "notes": "Signal points reconstructed from Avsec et al. Nature 2026."
                         }
                     },
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
                         "scorer": "DNASE",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (1.18) and quantile score (0.9992) reported in Avsec et al. Nature 2026."
                     }
                 }
             ],
@@ -927,8 +1007,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Cell type prone to urothelial and epidermal transformation upon TERT reactivation.",
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (1.52) and quantile score (0.99996) from Avsec et al. Nature 2026."
                     }
                 },
                 {
@@ -942,8 +1024,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Frequent primary driver in adult glioblastoma multiforme (GBM).",
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (1.48) and quantile score (0.99994) from Avsec et al. Nature 2026."
                     }
                 },
                 {
@@ -957,8 +1041,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Moderate predicted activation potential; somatic variant is tumor-specific.",
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (0.42) and quantile score (0.8840) from Avsec et al. Nature 2026."
                     }
                 }
             ],
@@ -977,15 +1063,18 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 },
                 "provenance": {
                     "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                    "evidenceClass": "reconstructed",
                     "source": "Avsec et al. Nature 2026 / ETS motif consensus",
                     "isIllustrative": False,
-                    "notes": "Verified ETS transcription factor de novo motif creation profile."
+                    "transformation": "Reconstructed from ETS motif consensus and published ISM figure",
+                    "notes": "ETS transcription factor de novo motif creation profile reconstructed from published benchmark."
                 }
             },
             "provenance": [
                 {
                     "field": "variant",
                     "sourceType": "Authoritative Genomic Reference (GRCh38 / GENCODE v46)",
+                    "evidenceClass": "published_exact",
                     "source": "GENCODE v46 / Ensembl MANE Select ENST00000310581.10",
                     "assembly": "GRCh38",
                     "notes": "Corrected GRCh38 coordinate chr5:1295113:G>A (c.-124C>T on minus strand; replaces legacy hg19 coordinate chr5:1295228)."
@@ -993,6 +1082,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 {
                     "field": "regulatory_scores",
                     "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                    "evidenceClass": "published_exact",
                     "source": "Avsec et al. Nature 649, 1206-1218 (2026)",
                     "notes": "ETS/GABP binding score 1.52 (quant=0.99996)."
                 }
@@ -1030,10 +1120,13 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 "explanation": "Top AlphaGenome Scorer Quantile: AlphaGenome correctly identifies the switch from canonical exon 6-7-8 inclusion to aberrant exon 6-8 skipping junction signal.",
                 "provenance": {
                     "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                    "evidenceClass": "derived",
                     "source": "Avsec et al. Nature 649, 1206-1218 (2026)",
                     "scorer": "SPLICE_JUNCTIONS",
                     "retrievedAt": "2026-09-09T00:00:00Z",
-                    "isIllustrative": False
+                    "transformation": "Percentile rank converted from quantile score (0.9998 * 100)",
+                    "isIllustrative": False,
+                    "notes": "AlphaGenome variant scorer quantile converted to percentile rank (not Atlas AVI composite score)."
                 }
             },
             "genomicRegion": {
@@ -1082,20 +1175,24 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "deltaValues": [-10.8, -10.9, -10.9, -10.9, -0.4, -0.2],
                         "provenance": {
                             "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                            "evidenceClass": "reconstructed",
                             "source": "Avsec et al. Nature 649, 1206-1218 (2026) Splicing Benchmark",
                             "scorer": "SPLICE_JUNCTIONS",
                             "biosample": "Spinal Cord (UBERON:0002240)",
                             "originalPointCount": 16384,
                             "displayPointCount": 6,
-                            "transformation": "Sampled at exon-intron boundaries of SMN locus",
-                            "isIllustrative": False
+                            "transformation": "Sampled at exon-intron boundaries of SMN locus from published figures",
+                            "isIllustrative": False,
+                            "notes": "Signal points reconstructed from Avsec et al. Nature 2026."
                         }
                     },
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
                         "scorer": "SPLICE_JUNCTIONS",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (2.84) and quantile score (0.9998) reported in Avsec et al. Nature 2026."
                     }
                 }
             ],
@@ -1121,8 +1218,11 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "label": "Canonical Exon 6 -> 7 (Lost in SMA)",
                         "provenance": {
                             "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                            "evidenceClass": "reconstructed",
                             "source": "Avsec et al. Nature 2026",
-                            "isIllustrative": False
+                            "isIllustrative": False,
+                            "transformation": "Canonical junction signal modeled from Figure 3",
+                            "notes": "Modeled junction signal reconstructed from Avsec et al. Nature 2026 Figure 3."
                         }
                     },
                     {
@@ -1140,8 +1240,11 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "label": "Canonical Exon 7 -> 8 (Lost in SMA)",
                         "provenance": {
                             "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                            "evidenceClass": "reconstructed",
                             "source": "Avsec et al. Nature 2026",
-                            "isIllustrative": False
+                            "isIllustrative": False,
+                            "transformation": "Canonical junction signal modeled from Figure 3",
+                            "notes": "Modeled junction signal reconstructed from Avsec et al. Nature 2026 Figure 3."
                         }
                     },
                     {
@@ -1160,16 +1263,21 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "label": "Exon Skipping Junction (Exon 6 -> Exon 8)",
                         "provenance": {
                             "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                            "evidenceClass": "reconstructed",
                             "source": "Avsec et al. Nature 2026",
-                            "isIllustrative": False
+                            "isIllustrative": False,
+                            "transformation": "Skipping junction signal modeled from Figure 3",
+                            "notes": "Modeled skipping arc signal reconstructed from Avsec et al. Nature 2026 Figure 3."
                         }
                     }
                 ],
                 "provenance": {
                     "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                    "evidenceClass": "reconstructed",
                     "source": "Avsec et al. Nature 2026 Figure 3",
                     "isIllustrative": False,
-                    "notes": "Modeled junction signals showing ~85% skipping arc dominance in alternate allele."
+                    "transformation": "Modeled junction signals showing ~85% skipping arc dominance in alternate allele",
+                    "notes": "Modeled junction signals showing ~85% skipping arc dominance in alternate allele, reconstructed from Avsec et al. Nature 2026 Figure 3."
                 }
             },
             "tissues": [
@@ -1184,8 +1292,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Vulnerable motor neuron pool suffers loss of functional SMN protein complex.",
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (2.84) and quantile score (0.9998) from Avsec et al. Nature 2026."
                     }
                 },
                 {
@@ -1199,8 +1309,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Splicing defect is ubiquitous across cell types, enabling peripheral RNA biomarker monitoring.",
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (2.76) and quantile score (0.9997) from Avsec et al. Nature 2026."
                     }
                 }
             ],
@@ -1208,6 +1320,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 {
                     "field": "variant",
                     "sourceType": "Authoritative Genomic Reference (GRCh38 / GENCODE v46)",
+                    "evidenceClass": "published_exact",
                     "source": "GENCODE v46 / Ensembl MANE Select ENST00000172062",
                     "assembly": "GRCh38",
                     "notes": "Corrected GRCh38 coordinate chr5:70951946:C>T (position +6 of Exon 7; replaces legacy intronic coordinate chr5:70925529)."
@@ -1215,6 +1328,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 {
                     "field": "splicing_scores",
                     "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                    "evidenceClass": "published_exact",
                     "source": "Avsec et al. Nature 649, 1206-1218 (2026)",
                     "notes": "Splice junction ratio shift score 2.84 (quant=0.9998)."
                 }
@@ -1252,10 +1366,13 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 "explanation": "Top AlphaGenome Scorer Quantile: Extreme cell-type selectivity: high impact on erythroid GATA1 binding and chromatin accessibility, but completely neutral in non-erythroid tissues.",
                 "provenance": {
                     "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                    "evidenceClass": "derived",
                     "source": "Avsec et al. Nature 649, 1206-1218 (2026)",
                     "scorer": "CHIP_TF",
                     "retrievedAt": "2026-09-09T00:00:00Z",
-                    "isIllustrative": False
+                    "transformation": "Percentile rank converted from quantile score (0.9991 * 100)",
+                    "isIllustrative": False,
+                    "notes": "AlphaGenome variant scorer quantile converted to percentile rank (not Atlas AVI composite score)."
                 }
             },
             "genomicRegion": {
@@ -1301,20 +1418,24 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "deltaValues": [-0.1, -1.6, -8.2, -1.8, 0.0],
                         "provenance": {
                             "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                            "evidenceClass": "reconstructed",
                             "source": "Avsec et al. Nature 649, 1206-1218 (2026) Erythroid Enhancer Study",
                             "scorer": "CHIP_TF",
                             "biosample": "K562 (EFO:0002067)",
                             "originalPointCount": 16384,
                             "displayPointCount": 5,
-                            "transformation": "Sampled across +58kb enhancer peak",
-                            "isIllustrative": False
+                            "transformation": "Sampled across +58kb enhancer peak from published study",
+                            "isIllustrative": False,
+                            "notes": "Signal points reconstructed from Avsec et al. Nature 2026."
                         }
                     },
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
                         "scorer": "CHIP_TF",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (-1.41) and quantile score (0.9991) reported in Avsec et al. Nature 2026."
                     }
                 },
                 {
@@ -1337,20 +1458,24 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "deltaValues": [-0.1, -1.8, -4.9, -1.9, -0.1],
                         "provenance": {
                             "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                            "evidenceClass": "reconstructed",
                             "source": "Avsec et al. Nature 649, 1206-1218 (2026)",
                             "scorer": "DNASE",
                             "biosample": "Erythroblasts (CL:0000765)",
                             "originalPointCount": 16384,
                             "displayPointCount": 5,
-                            "transformation": "Sampled across enhancer accessibility peak",
-                            "isIllustrative": False
+                            "transformation": "Sampled across enhancer accessibility peak from published study",
+                            "isIllustrative": False,
+                            "notes": "Signal points reconstructed from Avsec et al. Nature 2026."
                         }
                     },
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
                         "scorer": "DNASE",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (-0.87) and quantile score (0.9982) reported in Avsec et al. Nature 2026."
                     }
                 }
             ],
@@ -1366,8 +1491,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Target tissue: loss of enhancer activation de-represses fetal hemoglobin production.",
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (-1.41) and quantile score (0.9991) from Avsec et al. Nature 2026."
                     }
                 },
                 {
@@ -1381,8 +1508,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "BCL11A brain enhancer is located elsewhere; neural expression is completely preserved.",
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (0.01) and quantile score (0.0520) from Avsec et al. Nature 2026."
                     }
                 },
                 {
@@ -1396,8 +1525,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Model confirms high specificity: zero perturbation in non-erythroid lineages.",
                     "provenance": {
                         "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                        "evidenceClass": "published_exact",
                         "source": "Avsec et al. Nature 2026",
-                        "isIllustrative": False
+                        "isIllustrative": False,
+                        "notes": "Published raw score (-0.02) and quantile score (0.1200) from Avsec et al. Nature 2026."
                     }
                 }
             ],
@@ -1405,6 +1536,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 {
                     "field": "variant",
                     "sourceType": "Authoritative Genomic Reference (GRCh38 / GENCODE v46)",
+                    "evidenceClass": "published_exact",
                     "source": "GENCODE v46 / Ensembl MANE Select ENST00000642384.2",
                     "assembly": "GRCh38",
                     "notes": "chr2:60495255 is inside intron 2 of BCL11A, 12bp flanking the core GATA1 motif (60495264-60495271)."
@@ -1412,6 +1544,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 {
                     "field": "enhancer_scores",
                     "sourceType": "AlphaGenome Nature Paper (Avsec et al., 2026)",
+                    "evidenceClass": "published_exact",
                     "source": "Avsec et al. Nature 649, 1206-1218 (2026)",
                     "notes": "GATA1 ChIP-seq effect score -1.41 (quant=0.9991) with erythroid selectivity."
                 }
@@ -1449,6 +1582,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 "explanation": "Baseline Scorer Quantile: Effect score is near baseline zero (2.1 percentile). Delta tracks across expression, splicing, and chromatin remain flat, confirming absent molecular consequence.",
                 "provenance": {
                     "sourceType": "Authoritative Genomic Reference (GRCh38 / GENCODE v46)",
+                    "evidenceClass": "illustrative",
                     "source": "Ensembl MANE Select ENST00000003084.11 / ClinVar benign polymorphism",
                     "scorer": "RNA_SEQ",
                     "retrievedAt": "2026-09-09T00:00:00Z",
@@ -1497,6 +1631,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "deltaValues": [0.0, 0.0, 0.0, 0.0, 0.0],
                         "provenance": {
                             "sourceType": "Illustrative Educational Data",
+                            "evidenceClass": "illustrative",
                             "source": "Derived flat profile for negative control demonstration",
                             "scorer": "RNA_SEQ",
                             "biosample": "Lung (UBERON:0002048)",
@@ -1509,9 +1644,11 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     },
                     "provenance": {
                         "sourceType": "Illustrative Educational Data",
+                        "evidenceClass": "illustrative",
                         "source": "Negative control baseline",
                         "scorer": "RNA_SEQ",
-                        "isIllustrative": True
+                        "isIllustrative": True,
+                        "notes": "Illustrative control profile."
                     }
                 },
                 {
@@ -1534,6 +1671,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                         "deltaValues": [0.0, 0.0, 0.0, 0.0, 0.0],
                         "provenance": {
                             "sourceType": "Illustrative Educational Data",
+                            "evidenceClass": "illustrative",
                             "source": "Derived flat profile for splice neutrality",
                             "scorer": "SPLICE_SITES",
                             "biosample": "Lung (UBERON:0002048)",
@@ -1546,9 +1684,11 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     },
                     "provenance": {
                         "sourceType": "Illustrative Educational Data",
+                        "evidenceClass": "illustrative",
                         "source": "Negative control baseline",
                         "scorer": "SPLICE_SITES",
-                        "isIllustrative": True
+                        "isIllustrative": True,
+                        "notes": "Illustrative control profile."
                     }
                 }
             ],
@@ -1564,8 +1704,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Key tissue for cystic fibrosis pathology; zero predicted disruption.",
                     "provenance": {
                         "sourceType": "Authoritative Genomic Reference (GRCh38 / GENCODE v46)",
+                        "evidenceClass": "illustrative",
                         "source": "Biological negative control",
-                        "isIllustrative": True
+                        "isIllustrative": True,
+                        "notes": "Biological negative control baseline."
                     }
                 },
                 {
@@ -1579,8 +1721,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Confirmed absence of aberrant splicing or expression shifts.",
                     "provenance": {
                         "sourceType": "Authoritative Genomic Reference (GRCh38 / GENCODE v46)",
+                        "evidenceClass": "illustrative",
                         "source": "Biological negative control",
-                        "isIllustrative": True
+                        "isIllustrative": True,
+                        "notes": "Biological negative control baseline."
                     }
                 },
                 {
@@ -1594,8 +1738,10 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                     "contextNote": "Demonstrates specificity: model produces zero false positive alerts.",
                     "provenance": {
                         "sourceType": "Authoritative Genomic Reference (GRCh38 / GENCODE v46)",
+                        "evidenceClass": "illustrative",
                         "source": "Biological negative control",
-                        "isIllustrative": True
+                        "isIllustrative": True,
+                        "notes": "Biological negative control baseline."
                     }
                 }
             ],
@@ -1603,6 +1749,7 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 {
                     "field": "variant",
                     "sourceType": "Authoritative Genomic Reference (GRCh38 / GENCODE v46)",
+                    "evidenceClass": "published_exact",
                     "source": "GENCODE v46 / Ensembl MANE Select ENST00000003084.11 / ClinVar",
                     "assembly": "GRCh38",
                     "notes": "Corrected GRCh38 coordinate chr7:117642567:A>G (c.3870A>G, p.Ile1290Ile in Exon 23; replaces wrong exon coordinate 117559590)."
@@ -1610,7 +1757,9 @@ def get_curated_benchmark_variants() -> List[Dict[str, Any]]:
                 {
                     "field": "negative_control_profile",
                     "sourceType": "Illustrative Educational Data",
+                    "evidenceClass": "illustrative",
                     "source": "Curated negative control baseline",
+                    "isIllustrative": True,
                     "notes": "External biological negative control with explicitly labeled illustrative tracks demonstrating absence of effect."
                 }
             ]
@@ -1713,6 +1862,7 @@ def fetch_live_alphagenome_data(api_key: str) -> List[Dict[str, Any]]:
                         "affectedGene": gene_target,
                         "provenance": {
                             "sourceType": "AlphaGenome API",
+                            "evidenceClass": "live_api",
                             "source": "dna_model.score_variant",
                             "scorer": scorer_name,
                             "biosample": biosample,
@@ -1736,6 +1886,7 @@ def fetch_live_alphagenome_data(api_key: str) -> List[Dict[str, Any]]:
                 v["avi"]["statusText"] = f"Live AlphaGenome API result ({top_scorer} scorer quantile: {abs(top_quant):.5f})"
                 v["avi"]["provenance"] = {
                     "sourceType": "AlphaGenome API",
+                    "evidenceClass": "live_api",
                     "source": "dna_model.score_variant",
                     "scorer": top_scorer,
                     "biosample": top_tissue,
@@ -1748,6 +1899,7 @@ def fetch_live_alphagenome_data(api_key: str) -> List[Dict[str, Any]]:
                 v["provenance"].append({
                     "field": "alphaGenomeScores",
                     "sourceType": "AlphaGenome API",
+                    "evidenceClass": "live_api",
                     "source": "dna_model.score_variant",
                     "assembly": "GRCh38",
                     "retrievedAt": retrieval_timestamp,
@@ -1759,7 +1911,7 @@ def fetch_live_alphagenome_data(api_key: str) -> List[Dict[str, Any]]:
 
         except Exception as e:
             print(f"  -> Live query note for {var_str}: {e}")
-            print(f"  -> Preserving verified benchmark values for {var_str}.")
+            print(f"  -> Preserving curated benchmark values for {var_str}.")
 
         # Check Atlas AVI if client is available
         if atlas_client:

@@ -151,7 +151,7 @@ describe('Component Rendering & Scientific UI Verification', () => {
     expect(html).toContain('2. Scoring Metric Hierarchy: Raw vs Quantile vs Atlas AVI');
     expect(html).toContain('3. In Silico Mutagenesis (ISM) &amp; Sashimi Junctions');
     expect(html).toContain('4. Scientific Caveats &amp; In Silico Limitations');
-    expect(html).toContain('5. Transparent 5-Tier Data Provenance Framework');
+    expect(html).toContain('5. Six Evidence Classes Data Provenance Framework');
     expect(html).toContain('Avsec, Ž., Latysheva, N., Cheng, J. et al.');
   });
 
@@ -169,7 +169,7 @@ describe('Component Rendering & Scientific UI Verification', () => {
       expect(html).toContain('Scientific Data Provenance &amp; Verification Audit');
       expect(html).toContain(v.gene);
       expect(html).toContain(v.variant.replace('>', '&gt;'));
-      expect(html).toContain('5-Tier Classification Framework');
+      expect(html).toContain('Six Evidence Classes Framework');
       expect(html).toContain('Dataset Generation Metadata');
       expect(html).toContain('GRCh38');
     });

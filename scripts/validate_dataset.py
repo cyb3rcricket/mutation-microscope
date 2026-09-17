@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-Mutation Microscope - Dataset Scientific Integrity & Validation Script
+Mutation Microscope - Dataset Structural & Provenance Validation Script
 ======================================================================
-Enforces rigorous validation rules on variants.json:
+Enforces structural and provenance validation rules on variants.json:
 1. Assembly must be GRCh38 with valid chromosome and positive 1-based position.
 2. REF and ALT alleles must be single valid DNA nucleotides and differ from each other.
 3. Flanking sequence REF/ALT bases must strictly match the variant and have exact Watson-Crick complementation.
 4. Track arrays (positions, refValues, altValues, deltaValues) must have equal lengths.
 5. Track delta values must equal ALT - REF within tolerance (|delta - (alt - ref)| <= 0.05).
 6. Scorer quantile scores must be within valid range [0, 1] and percentile rank in [0, 100].
-7. AVI claims are validated: isAviAvailable can only be true if verified Atlas AVI provenance is present.
-8. Every variant and modality track must have structured provenance metadata.
+7. AVI claims are validated: isAviAvailable can only be true if authentic Atlas AVI provenance is present.
+8. Every provenance record must have a valid evidenceClass and required documentation metadata.
 9. Synthetic or illustrative data must have explicit `isIllustrative: True` labeling.
 10. Sashimi junctions and ISM matrices must satisfy structural integrity constraints.
 """
@@ -25,6 +25,52 @@ DATASET_PATH = ROOT_DIR / "src" / "data" / "variants.json"
 
 COMPLEMENT = str.maketrans("ATCGN", "TAGCN")
 VALID_BASES = {"A", "C", "G", "T"}
+VALID_EVIDENCE_CLASSES = {
+    "live_api",
+    "atlas",
+    "published_exact",
+    "derived",
+    "reconstructed",
+    "illustrative",
+}
+
+
+def validate_provenance_record(prov: Any, context: str, errors: List[str]) -> None:
+    if not isinstance(prov, dict):
+        errors.append(f"{context}: Provenance record must be an object/dict, got {type(prov)}")
+        return
+
+    ev_class = prov.get("evidenceClass")
+    if not ev_class:
+        errors.append(f"{context}: Missing required 'evidenceClass'")
+        return
+
+    if ev_class not in VALID_EVIDENCE_CLASSES:
+        errors.append(f"{context}: Invalid evidenceClass '{ev_class}'. Must be one of {sorted(VALID_EVIDENCE_CLASSES)}")
+        return
+
+    # Rule: live_api requires retrieval metadata (source, retrievedAt)
+    if ev_class == "live_api":
+        if not prov.get("source"):
+            errors.append(f"{context}: 'live_api' requires non-empty 'source'")
+        if not prov.get("retrievedAt"):
+            errors.append(f"{context}: 'live_api' requires non-empty 'retrievedAt'")
+
+    # Rule: derived / reconstructed require transformation documentation (transformation or notes)
+    if ev_class in ("derived", "reconstructed"):
+        if not prov.get("transformation") and not prov.get("notes"):
+            errors.append(f"{context}: '{ev_class}' requires transformation documentation ('transformation' or 'notes')")
+
+    # Rule: illustrative requires isIllustrative: True
+    if ev_class == "illustrative":
+        if prov.get("isIllustrative") is not True:
+            errors.append(f"{context}: 'illustrative' record requires 'isIllustrative: True'")
+
+    # Rule: Records with isIllustrative: True must have evidenceClass illustrative
+    if prov.get("isIllustrative") is True:
+        if ev_class != "illustrative":
+            errors.append(f"{context}: Record with isIllustrative: True must have evidenceClass 'illustrative', got '{ev_class}'")
+
 
 
 def validate_dataset(dataset_path: Path = DATASET_PATH) -> bool:
@@ -161,6 +207,9 @@ def validate_dataset(dataset_path: Path = DATASET_PATH) -> bool:
                 if avi.get("compositeScore") is not None:
                     errors.append(f"[{vid}] isAviAvailable is False but compositeScore is not null")
 
+            if avi.get("provenance"):
+                validate_provenance_record(avi["provenance"], f"[{vid}][avi provenance]", errors)
+
         # 6. Modalities & Track Consistency
         modalities = v.get("modalities", [])
         if not modalities:
@@ -171,6 +220,9 @@ def validate_dataset(dataset_path: Path = DATASET_PATH) -> bool:
             qscore = m.get("quantileScore")
             if qscore is None or not (0.0 <= abs(qscore) <= 1.0):
                 errors.append(f"[{vid}][{mid}] Quantile score {qscore} outside valid range [0, 1]")
+
+            if m.get("provenance"):
+                validate_provenance_record(m["provenance"], f"[{vid}][{mid} provenance]", errors)
 
             tracks = m.get("tracks")
             if not tracks:
@@ -202,8 +254,14 @@ def validate_dataset(dataset_path: Path = DATASET_PATH) -> bool:
             else:
                 if "isIllustrative" not in tprov:
                     errors.append(f"[{vid}][{mid}] Track provenance missing 'isIllustrative' flag")
+                validate_provenance_record(tprov, f"[{vid}][{mid} track provenance]", errors)
 
-        # 7. Sashimi Consistency
+        # 7. Tissues Consistency
+        for t_idx, t in enumerate(v.get("tissues", [])):
+            if t.get("provenance"):
+                validate_provenance_record(t["provenance"], f"[{vid}][tissue {t.get('name', t_idx)} provenance]", errors)
+
+        # 8. Sashimi Consistency
         sashimi = v.get("sashimi")
         if sashimi:
             exons = sashimi.get("exons", [])
@@ -211,13 +269,18 @@ def validate_dataset(dataset_path: Path = DATASET_PATH) -> bool:
             if not exons or not junctions:
                 errors.append(f"[{vid}][sashimi] Incomplete sashimi data (exons={len(exons)}, junctions={len(junctions)})")
 
-            for j in junctions:
+            if sashimi.get("provenance"):
+                validate_provenance_record(sashimi["provenance"], f"[{vid}][sashimi provenance]", errors)
+
+            for j_idx, j in enumerate(junctions):
                 ref_sig = j.get("refSignal") if j.get("refSignal") is not None else j.get("refReads")
                 alt_sig = j.get("altSignal") if j.get("altSignal") is not None else j.get("altReads")
                 if ref_sig is None or ref_sig < 0 or alt_sig is None or alt_sig < 0:
                     errors.append(f"[{vid}][sashimi] Negative or missing junction signal for junction {j.get('id')}")
+                if j.get("provenance"):
+                    validate_provenance_record(j["provenance"], f"[{vid}][sashimi junction {j.get('id', j_idx)} provenance]", errors)
 
-        # 8. ISM Matrix Consistency
+        # 9. ISM Matrix Consistency
         ism = v.get("ism")
         if ism:
             ism_pos = ism.get("positions", [])
@@ -234,11 +297,21 @@ def validate_dataset(dataset_path: Path = DATASET_PATH) -> bool:
             ism_prov = ism.get("provenance")
             if not ism_prov:
                 warnings.append(f"[{vid}][ism] Missing explicit ISM provenance record")
+            else:
+                validate_provenance_record(ism_prov, f"[{vid}][ism provenance]", errors)
 
-        # 9. Top-Level Provenance Records
+        # 10. Top-Level Provenance Records
         prov_list = v.get("provenance", [])
         if not prov_list or len(prov_list) == 0:
             errors.append(f"[{vid}] Missing top-level provenance list")
+        else:
+            for p_idx, p in enumerate(prov_list):
+                validate_provenance_record(p, f"[{vid}][top-level provenance #{p_idx} ({p.get('field', 'unspecified')})]", errors)
+
+        # 11. Live Scores (if present)
+        for s_idx, s in enumerate(v.get("alphaGenomeScores", [])):
+            if s.get("provenance"):
+                validate_provenance_record(s["provenance"], f"[{vid}][alphaGenomeScore #{s_idx} provenance]", errors)
 
     print("\n" + "=" * 70)
     print("VALIDATION REPORT:")
@@ -260,7 +333,11 @@ def validate_dataset(dataset_path: Path = DATASET_PATH) -> bool:
         print("\nDATASET VALIDATION FAILED!")
         return False
 
-    print("\nALL SCIENTIFIC INTEGRITY & PROVENANCE CHECKS PASSED!")
+    print("\n" + "=" * 70)
+    print("DATASET STRUCTURAL & PROVENANCE METADATA VALIDATION PASSED")
+    print("=" * 70)
+    print("Notice: Structural integrity, coordinates, and provenance metadata have been validated.")
+    print("External scientific claims and in silico predictions are not independently verified.")
     return True
 
 

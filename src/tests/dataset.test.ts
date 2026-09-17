@@ -118,26 +118,49 @@ describe('Mutation Microscope Dataset Integrity', () => {
     });
   });
 
-  it('ensures comprehensive structured provenance exists on every variant and track', () => {
+  const VALID_EVIDENCE_CLASSES = [
+    'live_api',
+    'atlas',
+    'published_exact',
+    'derived',
+    'reconstructed',
+    'illustrative',
+  ];
+
+  it('ensures comprehensive structured provenance with valid evidence classes exists on every variant and track', () => {
     dataset.forEach((v) => {
       expect(Array.isArray(v.provenance)).toBe(true);
       expect(v.provenance.length).toBeGreaterThanOrEqual(1);
 
+      v.provenance.forEach((p) => {
+        expect(VALID_EVIDENCE_CLASSES).toContain(p.evidenceClass);
+      });
+
+      if (v.avi.provenance) {
+        expect(VALID_EVIDENCE_CLASSES).toContain(v.avi.provenance.evidenceClass);
+      }
+
       v.modalities.forEach((m) => {
         const trackProv = m.tracks.provenance;
         expect(trackProv).toBeDefined();
+        expect(VALID_EVIDENCE_CLASSES).toContain(trackProv?.evidenceClass);
         expect(typeof trackProv?.isIllustrative).toBe('boolean');
         expect(trackProv?.source).toBeTruthy();
         expect(trackProv?.transformation).toBeTruthy();
+
+        if (trackProv?.isIllustrative) {
+          expect(trackProv.evidenceClass).toBe('illustrative');
+        }
       });
     });
   });
 
-  it('verifies explicit labeling on illustrative negative control data', () => {
+  it('verifies explicit labeling and evidence classes on illustrative negative control data', () => {
     const cftr = dataset.find((v) => v.gene === 'CFTR');
     expect(cftr).toBeDefined();
     cftr?.modalities.forEach((m) => {
       expect(m.tracks.provenance?.isIllustrative).toBe(true);
+      expect(m.tracks.provenance?.evidenceClass).toBe('illustrative');
       expect(m.tracks.provenance?.notes).toContain('Illustrative visualization');
     });
   });

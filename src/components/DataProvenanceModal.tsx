@@ -12,7 +12,7 @@ import {
   AlertTriangle,
   Calendar,
 } from 'lucide-react';
-import { VariantData, ProvenanceSourceType } from '../types/variant';
+import { VariantData, ProvenanceSourceType, EvidenceClass } from '../types/variant';
 import metadataJson from '../data/metadata.json';
 
 interface DataProvenanceModalProps {
@@ -54,6 +54,43 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
     }
   };
 
+  const getEvidenceBadgeClass = (evidenceClass: EvidenceClass) => {
+    switch (evidenceClass) {
+      case 'live_api':
+        return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40';
+      case 'atlas':
+        return 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40';
+      case 'published_exact':
+        return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+      case 'derived':
+        return 'bg-blue-500/20 text-blue-300 border-blue-500/40';
+      case 'reconstructed':
+        return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+      case 'illustrative':
+      default:
+        return 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+    }
+  };
+
+  const getEvidenceLabel = (evidenceClass: EvidenceClass) => {
+    switch (evidenceClass) {
+      case 'live_api':
+        return '⚡ Live API';
+      case 'atlas':
+        return '🌐 Atlas';
+      case 'published_exact':
+        return '✓ Published Exact';
+      case 'derived':
+        return '⚙️ Derived';
+      case 'reconstructed':
+        return '📐 Reconstructed';
+      case 'illustrative':
+        return '⚠️ Illustrative';
+      default:
+        return evidenceClass;
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto"
@@ -73,7 +110,7 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
                 Scientific Data Provenance & Verification Audit
               </h2>
               <p className="text-xs text-slate-400">
-                Transparent verification trail: AlphaGenome API, Atlas, Nature 2026 publication, and GRCh38 references
+                Transparent provenance trail: AlphaGenome API, Atlas, Nature 2026 publication, and GRCh38 references
               </p>
             </div>
           </div>
@@ -110,7 +147,7 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>5-Tier Classification Framework</span>
+            <span>Six Evidence Classes Framework</span>
           </button>
 
           <button
@@ -220,6 +257,7 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
               </div>
 
               {/* Structured Provenance Records Table */}
+              {/* Structured Provenance Records Table */}
               <div className="space-y-2">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300">
                   Provenance Records ({selectedVariant.provenance.length} top-level entries)
@@ -229,8 +267,9 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
                     <thead>
                       <tr className="border-b border-white/10 text-slate-400 font-mono text-[11px]">
                         <th className="p-3">Field / Scope</th>
+                        <th className="p-3">Evidence Class</th>
                         <th className="p-3">Source Category</th>
-                        <th className="p-3">Verified Source</th>
+                        <th className="p-3">Source Reference</th>
                         <th className="p-3">Notes & Audit Details</th>
                       </tr>
                     </thead>
@@ -239,6 +278,15 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
                         <tr key={idx} className="hover:bg-white/[0.02]">
                           <td className="p-3 font-mono text-cyan-300 font-medium">
                             {p.field || 'variant_core'}
+                          </td>
+                          <td className="p-3">
+                            <span
+                              className={`inline-block px-2 py-0.5 rounded text-[10px] font-mono border ${getEvidenceBadgeClass(
+                                p.evidenceClass
+                              )}`}
+                            >
+                              {getEvidenceLabel(p.evidenceClass)}
+                            </span>
                           </td>
                           <td className="p-3">
                             <span
@@ -273,13 +321,21 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
                       >
                         <div className="flex items-center justify-between">
                           <span className="font-semibold text-white">{m.name}</span>
-                          {tp?.isIllustrative ? (
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                          {tp?.evidenceClass ? (
+                            <span
+                              className={`text-[10px] font-mono px-2 py-0.5 rounded border ${getEvidenceBadgeClass(
+                                tp.evidenceClass
+                              )}`}
+                            >
+                              {getEvidenceLabel(tp.evidenceClass)}
+                            </span>
+                          ) : tp?.isIllustrative ? (
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40">
                               ⚠️ Illustrative
                             </span>
                           ) : (
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
-                              ✓ Verified
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                              ✓ Published Exact
                             </span>
                           )}
                         </div>
@@ -296,13 +352,18 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
                             )}
                             {tp.transformation && (
                               <div>
-                                <strong className="text-slate-300">Sampling:</strong> {tp.transformation}
+                                <strong className="text-slate-300">Transformation:</strong> {tp.transformation}
                               </div>
                             )}
                             {tp.displayPointCount && tp.originalPointCount && (
                               <div>
                                 <strong className="text-slate-300">Points:</strong>{' '}
                                 {tp.displayPointCount} display from {tp.originalPointCount.toLocaleString()} original
+                              </div>
+                            )}
+                            {tp.notes && (
+                              <div>
+                                <strong className="text-slate-300">Notes:</strong> {tp.notes}
                               </div>
                             )}
                           </div>
@@ -346,89 +407,108 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
             </div>
           )}
 
-          {/* TAB 2: 5-TIER CLASSIFICATION FRAMEWORK */}
+          {/* TAB 2: SIX EVIDENCE CLASSES FRAMEWORK */}
           {activeTab === 'framework' && (
             <div className="space-y-4">
               <p className="text-xs text-slate-300 leading-relaxed">
-                To guarantee absolute scientific integrity and defensibility, every numerical value, sequence, and
-                functional prediction in Mutation Microscope is categorized into one of five rigorous tiers:
+                Mutation Microscope classifies scientific data by how directly it can be traced to its original source.
+                Every numerical value, sequence, and functional prediction is categorized into one of six evidence classes:
               </p>
 
               <div className="space-y-3">
                 <div className="p-3.5 rounded-xl bg-obsidian-950 border border-cyan-500/30 space-y-1">
                   <div className="flex items-center justify-between">
                     <strong className="text-cyan-300 font-mono text-xs">
-                      1. Direct AlphaGenome API Result
+                      1. Live API Query (<code>live_api</code>)
                     </strong>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
-                      Tier 1
+                      live_api
                     </span>
                   </div>
                   <p className="text-xs text-slate-300">
-                    Live predictions returned by the DeepMind AlphaGenome client (<code>dna_model.score_variant</code>)
-                    with genuine raw effect scores, empirical quantile scores, and biosample metadata.
+                    Returned directly from an AlphaGenome API request (<code>dna_model.score_variant</code>).
+                    Used only when the value was retrieved programmatically from the API and preserved with retrieval metadata (source, scorer, biosample, retrievedAt).
                   </p>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-obsidian-950 border border-indigo-500/30 space-y-1">
                   <div className="flex items-center justify-between">
                     <strong className="text-indigo-300 font-mono text-xs">
-                      2. Direct AlphaGenome Atlas Result (AVI)
+                      2. AlphaGenome Atlas (<code>atlas</code>)
                     </strong>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
-                      Tier 2
+                      atlas
                     </span>
                   </div>
                   <p className="text-xs text-slate-300">
-                    Predictions queried from the AlphaGenome Atlas variant portal, including composite AlphaGenome
-                    Variant Impact (AVI) scores and model feature attributions. Displayed ONLY when confirmed by Atlas.
+                    Returned directly from AlphaGenome Atlas. Used only for values explicitly retrieved from Atlas, such as confirmed Atlas-specific variant-impact composite scores (AVI).
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-obsidian-950 border border-emerald-500/30 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <strong className="text-emerald-300 font-mono text-xs">
+                      3. Published Exact Reference (<code>published_exact</code>)
+                    </strong>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                      published_exact
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300">
+                    An exact value, coordinate, sequence, or result explicitly reported in a cited publication, official AlphaGenome example, or authoritative genomic reference (e.g. GRCh38 coordinates, MANE Select models, ClinVar).
                   </p>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-obsidian-950 border border-blue-500/30 space-y-1">
                   <div className="flex items-center justify-between">
                     <strong className="text-blue-300 font-mono text-xs">
-                      3. Published AlphaGenome Benchmark (Nature 2026 / Science Skills)
+                      4. Derived / Transformed Data (<code>derived</code>)
                     </strong>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/40">
-                      Tier 3
+                      derived
                     </span>
                   </div>
                   <p className="text-xs text-slate-300">
-                    Reconstructed from primary figures, tables, and golden reference examples in Avsec et al.,
-                    <em>Nature</em> 649, 1206–1218 (2026) and official DeepMind Science Skills (e.g. APOA1, COL6A2, HBA2).
+                    Calculated or transformed from one or more traceable source values. Examples include ALT − REF deltas, quantile-to-percentile conversions, normalization, and deterministic downsampling. The transformation must be documented.
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-obsidian-950 border border-purple-500/30 space-y-1">
+                <div className="p-3.5 rounded-xl bg-obsidian-950 border border-amber-500/30 space-y-1">
                   <div className="flex items-center justify-between">
-                    <strong className="text-purple-300 font-mono text-xs">
-                      4. Authoritative Genomic Reference (GRCh38 / GENCODE v46 / ClinVar)
+                    <strong className="text-amber-300 font-mono text-xs">
+                      5. Reconstructed from Publication (<code>reconstructed</code>)
                     </strong>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">
-                      Tier 4
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                      reconstructed
                     </span>
                   </div>
                   <p className="text-xs text-slate-300">
-                    Genomic coordinates, reference sequences, Watson-Crick complementation, transcript models (MANE Select),
-                    and disease annotations verified against NCBI RefSeq, Ensembl 112, and GENCODE v46.
+                    Recreated or approximated from a published figure, plot, screenshot, or narrative description that does not provide the exact displayed values directly. Reconstructed data may represent a genuine published result, but displayed numerical values are not claimed to be exact source values.
                   </p>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-obsidian-950 border border-rose-500/30 space-y-1">
                   <div className="flex items-center justify-between">
                     <strong className="text-rose-300 font-mono text-xs">
-                      5. Illustrative Educational Data (Explicitly Labeled)
+                      6. Illustrative Educational Data (<code>illustrative</code>)
                     </strong>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40">
-                      Tier 5
+                      illustrative
                     </span>
                   </div>
                   <p className="text-xs text-slate-300">
-                    Where continuous raw tracks are unavailable or negative control baselines are represented, data is
-                    explicitly tagged with <code>isIllustrative: true</code> and displayed with visible warning banners.
-                    It is never disguised as authentic AlphaGenome model output.
+                    Synthetic or intentionally constructed data used to explain a concept, demonstrate interface behavior, or provide an educational control (e.g. flat negative control baselines). Illustrative values are never presented as direct model output or exact published results.
                   </p>
+                </div>
+              </div>
+
+              {/* Distinction & Rule Callouts */}
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 space-y-2 text-xs">
+                <div className="text-slate-200">
+                  <strong className="text-amber-300">Important Distinction:</strong> <code>reconstructed</code> and <code>illustrative</code> are not the same. Reconstructed visualizations approximate real published AlphaGenome results (e.g. Nature 2026 figures), whereas illustrative data is intentionally synthetic for educational demonstration.
+                </div>
+                <div className="text-slate-200">
+                  <strong className="text-cyan-300">General Rule:</strong> If the repository cannot demonstrate that a value is exact, it must not be labeled as exact. When evidence is uncertain, the more conservative classification is applied.
                 </div>
               </div>
             </div>
@@ -489,7 +569,7 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
                     uv run scripts/generate_dataset.py --fetch-live
                   </div>
                   <div className="p-2 rounded bg-black/50 text-slate-300">
-                    <span className="text-slate-500"># 3. Scientific integrity audit:</span>
+                    <span className="text-slate-500"># 3. Scientific provenance audit:</span>
                     <br />
                     npm run validate
                   </div>
