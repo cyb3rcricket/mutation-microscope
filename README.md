@@ -178,14 +178,9 @@ uv run scripts/validate_dataset.py
 To query DeepMind's live AlphaGenome API (`score_variant` endpoint and Atlas client) to enrich variants with live scalar effect scores and calibrated quantiles:
 
 1. Register for an official API key at [deepmind.google.com/science/alphagenome](https://deepmind.google.com/science/alphagenome/).
-2. Configure your API key using either a `.env` file or an environment variable:
+2. Export your API key in your shell environment (see `.env.example` as a safe configuration template/reference):
 
 ```bash
-# Option A: Copy the template and add your API key (loaded automatically via python-dotenv)
-cp .env.example .env
-# Edit .env: ALPHAGENOME_API_KEY=your_alphagenome_api_key_here
-
-# Option B: Export directly into your shell environment
 export ALPHAGENOME_API_KEY="your_alphagenome_api_key_here"
 ```
 
