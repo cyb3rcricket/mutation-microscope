@@ -134,18 +134,22 @@ Prior to artifact compilation or CI pass, the validator verifies:
 
 Mutation Microscope includes an optional live enrichment module utilizing the official `alphagenome` Python SDK.
 
+### Zero-Secret Production Separation
+The production web client (deployed on Vercel) and local React/Vite development server require **zero API keys** and execute **zero live API requests**. All client views are statically driven by the committed dataset in [`src/data/variants.json`](../src/data/variants.json). Live API enrichment is solely an optional developer-side compilation utility.
+
 ### CLI Execution
 ```bash
 # Offline verification mode (default; requires no credentials)
 uv run scripts/generate_dataset.py --verify
 
-# Live API query mode (requires valid DeepMind API key)
-export ALPHAGENOME_API_KEY="your-key-here"
+# Live API query mode (developer-side; requires valid DeepMind API key in process environment)
+export ALPHAGENOME_API_KEY="your_alphagenome_api_key_here"
 uv run scripts/generate_dataset.py --fetch-live
 ```
 
 ### Technical Implementation & Invariants
-- **gRPC Connection**: Connects to `dns:///gdmscience.googleapis.com:443` using `dna_client.create(api_key=...)`.
+- **Process Environment Resolution**: The generator reads `ALPHAGENOME_API_KEY` directly from the OS process environment using `os.environ.get("ALPHAGENOME_API_KEY")`. It does **not** automatically parse or load `.env` files.
+- **gRPC Connection**: When the key is present, connects to `dns:///gdmscience.googleapis.com:443` using `dna_client.create(api_key=...)`.
 - **Target Scorers**: Queries scalar variant scorers across biological modalities:
   - `RNA_SEQ` (Gene expression change in cardiac, liver, and epithelial tissues)
   - `DNASE` (Chromatin accessibility perturbation in erythroid and renal cells)
@@ -154,8 +158,9 @@ uv run scripts/generate_dataset.py --fetch-live
 - **Data Tidy & Extraction**: Returned `AnnData` objects are processed via `variant_scorers.tidy_scores` into structured pandas tables.
 - **`mixed` Source Mode Semantics**:
   - Live scalar model outputs enrich `alphaGenomeScores` and top calibrated impact quantiles under evidence class `live_api`.
-  - **Explicit Architectural Boundary**: Continuous 1Mb genomic tracks, Sashimi splice junction curves, and ISM matrices retain their benchmark provenance (`published_exact` / `reconstructed` / `illustrative`) and are **NOT** synthesized by the live API query.
-- **Fallback Guarantee**: If `ALPHAGENOME_API_KEY` is not detected, the pipeline automatically compiles the curated benchmark dataset without failure.
+  - **Explicit Architectural Boundary**: Continuous 1Mb genomic tracks, Sashimi splice junction curves, reference/alternate sequences, and ISM matrices retain their benchmark provenance (`published_exact` / `reconstructed` / `derived` / `illustrative`) and are **NOT** synthesized by the live API query.
+  - When live query data is merged, `src/data/metadata.json` records `sourceMode: "mixed"` with the exact count of live-enriched variants.
+- **Fallback Guarantee**: If `ALPHAGENOME_API_KEY` is not detected in the environment or if an API call fails, the pipeline automatically catches the condition and compiles the curated benchmark dataset with original provenance without throwing unhandled exceptions.
 
 ---
 
@@ -184,7 +189,8 @@ flowchart LR
 
 ## 7. Security & Threat Model
 
-1. **Client-Side Secret Elimination**: Zero API keys, authentication tokens, or private endpoints exist in client-side code or bundled static assets.
-2. **Environment Variable Containment**: `ALPHAGENOME_API_KEY` is strictly confined to developer local environments during optional `--fetch-live` runs. It is never committed, bundled, or loaded by Vite.
-3. **Immutable Static Delivery**: All application assets are served as read-only static files over HTTPS with strict Content Security Policies via Vercel Edge CDN.
-4. **Non-Diagnostic Sandboxing**: The interface prominently features an educational disclaimer banner, ensuring clear user context regarding the exploratory research nature of deep learning variant effect predictions.
+1. **Client-Side Secret Elimination**: Zero API keys, authentication tokens, or private endpoints exist in client-side code, runtime state, or bundled static assets. The public Vercel production app serves purely static files with no runtime server or secret-bearing API routes.
+2. **Environment Variable Containment**: `ALPHAGENOME_API_KEY` is strictly confined to developer local process environments during optional `--fetch-live` runs. It is never committed, bundled, prefixed with `VITE_` (which would bundle it into public client JS), or added to Vercel deployment variables.
+3. **No Automatic Dotenv Loading**: Neither the Python pipeline nor Vite automatically loads `.env` files, preventing accidental credential leaks from forgotten local configuration files.
+4. **Immutable Static Delivery**: All application assets are served as read-only static files over HTTPS with strict Content Security Policies via Vercel Edge CDN.
+5. **Non-Diagnostic Sandboxing**: The interface prominently features an educational disclaimer banner, ensuring clear user context regarding the exploratory research nature of deep learning variant effect predictions.

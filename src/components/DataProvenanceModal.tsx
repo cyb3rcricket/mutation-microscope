@@ -692,12 +692,12 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
                   <div className="p-2 rounded bg-black/50 text-slate-300">
                     <span className="text-slate-500"># 1. Offline verification and export:</span>
                     <br />
-                    python3 scripts/generate_dataset.py --verify
+                    uv run scripts/generate_dataset.py --verify
                   </div>
                   <div className="p-2 rounded bg-black/50 text-slate-300">
                     <span className="text-slate-500"># 2. Query live AlphaGenome API:</span>
                     <br />
-                    export ALPHAGENOME_API_KEY="your-key"
+                    export ALPHAGENOME_API_KEY="your_alphagenome_api_key_here"
                     <br />
                     uv run scripts/generate_dataset.py --fetch-live
                   </div>

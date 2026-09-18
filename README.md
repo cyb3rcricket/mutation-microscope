@@ -58,8 +58,8 @@ To evaluate this project accurately, it is essential to distinguish between the 
    - In-app Data Provenance modal providing complete audit trails for every field in the dataset.
 
 5. **Deterministic Offline Replay with Optional Live API Enrichment**:
-   - Fully functional and testable without credentials.
-   - Optional `--fetch-live` pipeline flag enriches variants using DeepMind's official gRPC API when `ALPHAGENOME_API_KEY` is provided, with automated fallback invariants.
+   - Fully functional and testable without credentials. The public Vercel production web app requires zero secrets and runs strictly from committed static data.
+   - Optional developer-side `--fetch-live` pipeline flag enriches variants using DeepMind's official gRPC API when `ALPHAGENOME_API_KEY` is provided in the process environment, with automated fallback invariants.
 
 ---
 
@@ -129,18 +129,44 @@ npm run build
 
 ## 📡 Optional Live AlphaGenome API Enrichment
 
-To query Google DeepMind's live AlphaGenome API endpoint (`score_variant`) and Atlas client:
+### Zero-Secret Production vs. Developer Pipeline Separation
+Mutation Microscope is designed as a strictly **offline-first, zero-secret scientific application**:
+- **Public Production Web App**: The public production app hosted on Vercel does **NOT** require `ALPHAGENOME_API_KEY`. It runs entirely from the committed, provenance-audited dataset in [`src/data/variants.json`](src/data/variants.json) and metadata in [`src/data/metadata.json`](src/data/metadata.json).
+- **Client Boundary**: `ALPHAGENOME_API_KEY` is never required by, bundled with, or exposed to the React/Vite client. Browser sessions execute zero live gRPC or REST calls to Google DeepMind servers.
+- **Developer Pipeline Only**: The API key is exclusively used by the developer-side Python compilation pipeline when explicitly invoked with the `--fetch-live` flag:
+  ```bash
+  uv run scripts/generate_dataset.py --fetch-live
+  ```
 
-1. Obtain an authorized API key from [deepmind.google.com/science/alphagenome](https://deepmind.google.com/science/alphagenome/).
-2. Export the key into your environment (see `.env.example`):
+### What Live Mode Enriches vs. What Remains Curated
+When `--fetch-live` is executed with a valid key, the pipeline connects to DeepMind's AlphaGenome API (`dna_model.score_variant` via gRPC) and the Atlas client across supported modalities (`RNA_SEQ`, `DNASE`, `CHIP_TF`, `SPLICE_JUNCTION`):
+- **Live Enriched**: Supported scalar AlphaGenome model outputs and calibrated quantile rankings populate each variant's `alphaGenomeScores` array and update the top impact quantile fields in `avi` under evidence class `live_api`.
+- **Curated Benchmark Invariant**: Continuous 1Mb genomic tracks, dynamic Sashimi splicing arc data, reference/alternate sequences, in silico mutagenesis (ISM) matrices, and biological annotations **retain their existing provenance** (`published_exact`, `reconstructed`, `derived`, or `illustrative`). These rich structures are derived from published AlphaGenome benchmark literature and are **not** synthesized by live scalar queries.
+- **`mixed` Source Mode Semantics**: Because live queries enrich scalar score arrays without replacing baseline structural tracks, successful live queries produce a `mixed` dataset source mode in `src/data/metadata.json` rather than treating the whole dataset as live.
+
+### Environment Resolution & CLI Execution
+The dataset generator reads `ALPHAGENOME_API_KEY` directly from the OS process environment using `os.environ.get("ALPHAGENOME_API_KEY")`.
+> [!IMPORTANT]
+> Neither the Python dataset pipeline nor Vite automatically loads `.env` files. You must export the variable in your terminal session before running the command.
+
+**Safe macOS / Linux Setup:**
+1. Register for an authorized API key at [deepmind.google.com/science/alphagenome](https://deepmind.google.com/science/alphagenome/).
+2. Export the key into your active shell session:
    ```bash
    export ALPHAGENOME_API_KEY="your_alphagenome_api_key_here"
    ```
-3. Run the live query pipeline:
+3. Run the live enrichment pipeline:
    ```bash
    uv run scripts/generate_dataset.py --fetch-live
    ```
-*Note: If the key is not set or queries fail, the pipeline automatically preserves the verified benchmark records without throwing unhandled exceptions.*
+
+### Automated Fallback Guarantee
+If `ALPHAGENOME_API_KEY` is absent from your environment, or if network queries fail or time out, the pipeline **automatically preserves the curated benchmark records with their original provenance**. It logs an informational notice and completes dataset generation cleanly without crashing or throwing unhandled exceptions.
+
+### 🔒 Security Warnings
+- **Never commit API keys**: Do not commit keys or `.env` files to git.
+- **Never use `VITE_` prefix**: Never name the key `VITE_ALPHAGENOME_API_KEY`. Any variable with a `VITE_` prefix is automatically embedded into client-side JavaScript bundles by Vite and becomes publicly visible to anyone inspecting the page.
+- **Never configure in Vercel deployment variables**: Do not add `ALPHAGENOME_API_KEY` to Vercel project environment settings. The deployed web application is purely static and requires zero credentials.
 
 ---
 
