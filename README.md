@@ -18,8 +18,7 @@
 
 ### Dashboard Preview
 ![Mutation Microscope Preview](docs/assets/preview.png)
-*Interactive observatory dashboard demonstrating single-nucleotide variant effect visualization across chromosome, gene body, and sequence scales with comparative epigenomic tracks.*  
-*(Note: To update the dashboard preview graphic, place an exported screenshot at `docs/assets/preview.png`)*
+*Interactive observatory dashboard demonstrating single-nucleotide variant effect visualization across chromosome, gene body, and sequence scales with comparative epigenomic tracks.*
 
 ---
 
@@ -34,7 +33,7 @@ To evaluate this project accurately, it is essential to distinguish between the 
 | **Data Provenance** | Model output matrices and scalar quantiles. | Radical 6-tier field-level scientific provenance system (`live_api`, `atlas`, `published_exact`, `derived`, `reconstructed`, `illustrative`) with in-app audit modals. |
 | **Runtime Model** | Compute-heavy deep learning inference requiring GPUs or authenticated gRPC endpoints. | **Zero-secret, offline-first client runtime** bundling curated benchmark variants into deterministic JSON artifacts running at 60 FPS in standard browsers. |
 | **Data Pipeline** | Raw API requests and evaluation scripts. | Modular, reproducible Python pipeline (`uv`) decoupling declarative benchmark records from compiler logic with strict schema validation gates. |
-| **Production Delivery** | Cloud API service. | Fully automated CI/CD lifecycle (lint, strict typecheck, 33 automated unit & user-flow tests, static edge deployment via Vercel). |
+| **Production Delivery** | Cloud API service. | Fully automated CI/CD lifecycle (lint, strict typecheck, 38 automated unit & user-flow tests, static edge deployment via Vercel). |
 
 ---
 
@@ -113,7 +112,7 @@ npm run lint
 # Run TypeScript typecheck (strict mode)
 npm run typecheck
 
-# Run Vitest test suite (33 tests: dataset integrity, components, user flows)
+# Run Vitest test suite (38 tests: dataset integrity, components, user flows, display helpers)
 npm test
 
 # Run dataset schema and provenance validation

@@ -17,6 +17,8 @@ Expected metadata:
 * biosample, when applicable
 * retrievedAt
 
+`live_api` classifies how a value was obtained in the dataset pipeline. It does not mean the public production web app performs live AlphaGenome inference. Optional `--fetch-live` enrichment is developer-side only; production serves committed provenance-tracked data, and the deployed React/Vite client does not call AlphaGenome.
+
 ## `atlas`
 
 Returned directly from AlphaGenome Atlas.

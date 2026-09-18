@@ -8,6 +8,7 @@ import {
   Dna,
   Layers,
 } from 'lucide-react';
+import { useEscapeToClose } from '../hooks/useEscapeToClose';
 
 interface TransparencyModalProps {
   isOpen: boolean;
@@ -18,19 +19,26 @@ export const TransparencyModal: React.FC<TransparencyModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  useEscapeToClose(isOpen, onClose);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="methodology-title"
+    >
       <div className="relative w-full max-w-4xl bg-obsidian-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-obsidian-950/80">
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-dna-cyan">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-white/10 bg-obsidian-950/80 gap-3">
+          <div className="flex items-center space-x-3 min-w-0">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-dna-cyan shrink-0">
               <BookOpen className="w-4 h-4" />
             </div>
-            <div>
-              <h2 className="text-base font-bold text-white tracking-wide">
+            <div className="min-w-0">
+              <h2 id="methodology-title" className="text-sm sm:text-base font-bold text-white tracking-wide leading-snug">
                 Scientific Methodology & Transparency Guide
               </h2>
               <p className="text-xs text-slate-400">
@@ -41,7 +49,7 @@ export const TransparencyModal: React.FC<TransparencyModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-400 hover:text-white transition-colors shrink-0"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -152,7 +160,7 @@ export const TransparencyModal: React.FC<TransparencyModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
               <div className="p-2.5 rounded bg-white/[0.02] border border-cyan-500/30 text-slate-300">
                 <strong className="text-cyan-300 block">1. Live API (<code>live_api</code>)</strong>
-                Live predictions queried directly from Google DeepMind's Python client.
+                Values retrieved from Google DeepMind's Python client during the optional developer-side dataset pipeline. Public production does not perform live inference; the deployed client does not call AlphaGenome.
               </div>
               <div className="p-2.5 rounded bg-white/[0.02] border border-indigo-500/30 text-slate-300">
                 <strong className="text-indigo-300 block">2. AlphaGenome Atlas (<code>atlas</code>)</strong>

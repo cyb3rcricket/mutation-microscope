@@ -1,6 +1,6 @@
 import React from 'react';
 import { VariantData } from '../types/variant';
-import { ExternalLink, FileText } from 'lucide-react';
+import { ExternalLink, FileText, Github } from 'lucide-react';
 
 interface FooterProps {
   currentVariant: VariantData;
@@ -26,6 +26,18 @@ export const Footer: React.FC<FooterProps> = ({
             Derived from Google DeepMind's AlphaGenome foundation model benchmarks (Avsec et al., <em>Nature</em> 2026).
             Demonstrating how a single DNA letter change predicts multimodal molecular consequences across chromatin, transcription, and RNA processing.
           </p>
+          <p className="text-slate-400 text-[11px] leading-relaxed max-w-xl">
+            Application, visualization, and provenance engineering by{' '}
+            <a
+              href="https://github.com/cyb3rcricket/mutation-microscope"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-200 hover:text-cyan-300 underline underline-offset-2 decoration-white/20 hover:decoration-cyan-400/50"
+            >
+              Tommi (@cyb3rcricket)
+            </a>
+            .
+          </p>
         </div>
 
         {/* Right action links */}
@@ -39,12 +51,23 @@ export const Footer: React.FC<FooterProps> = ({
           </button>
 
           <a
+            href="https://github.com/cyb3rcricket/mutation-microscope"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 transition-colors"
+          >
+            <Github className="w-3.5 h-3.5" />
+            <span>Source on GitHub</span>
+          </a>
+
+          <a
             href={currentVariant.atlasUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition-colors"
+            title="Open Google DeepMind AlphaGenome Atlas (this URL is an Atlas entry point; it may not load this exact variant)"
           >
-            <span>Open in AlphaGenome Atlas</span>
+            <span>Explore AlphaGenome Atlas</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { VariantData, ImpactTier } from '../types/variant';
 import { Info, Award } from 'lucide-react';
+import { formatPercentileRank } from '../utils/format';
 
 interface MolecularImpactPanelProps {
   variant: VariantData;
@@ -71,8 +72,8 @@ export const MolecularImpactPanel: React.FC<MolecularImpactPanelProps> = ({ vari
 
       <div>
         {/* Header with Tooltip info */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-between mb-4 gap-2">
+          <div className="flex items-center space-x-2 min-w-0 flex-wrap">
             <Award className="w-4 h-4 text-dna-cyan" />
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
               {isAvi ? 'AlphaGenome Variant Impact (AVI)' : 'AlphaGenome Predicted Molecular Impact'}
@@ -137,7 +138,7 @@ export const MolecularImpactPanel: React.FC<MolecularImpactPanelProps> = ({ vari
             {/* Gauge Center Value */}
             <div className="absolute bottom-1 flex flex-col items-center">
               <span className="text-2xl font-bold font-mono tracking-tight text-white leading-none">
-                {avi.percentileRank.toFixed(1)}%
+                {formatPercentileRank(avi.percentileRank)}
               </span>
               <span className="text-[10px] text-slate-400 uppercase font-mono tracking-wider mt-0.5">
                 {isAvi ? 'AVI Percentile' : 'Scorer Quantile'}

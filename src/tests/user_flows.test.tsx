@@ -214,6 +214,12 @@ describe('Mutation Microscope User-Flow Automated Tests', () => {
       fireEvent.click(frameworkTab);
       expect(screen.getAllByText(/live_api/i).length).toBeGreaterThanOrEqual(1);
       expect(screen.getAllByText(/illustrative/i).length).toBeGreaterThanOrEqual(1);
+      expect(
+        screen.getByText(/optional developer-side data pipeline/i)
+      ).toBeDefined();
+      expect(
+        screen.getByText(/deployed React\/Vite client does not call AlphaGenome live/i)
+      ).toBeDefined();
 
       // Click Dataset tab
       fireEvent.click(datasetTab);
@@ -226,6 +232,20 @@ describe('Mutation Microscope User-Flow Automated Tests', () => {
 
       // Verify modal is dismissed
       expect(screen.queryByText('Scientific Data Provenance & Verification Audit')).toBeNull();
+    });
+
+    it('closes the provenance modal on Escape and restores focus to the opener', () => {
+      render(<App />);
+
+      const openBtn = screen.getByRole('button', { name: /Data Provenance/i });
+      openBtn.focus();
+      expect(document.activeElement).toBe(openBtn);
+      fireEvent.click(openBtn);
+      expect(screen.getByText('Scientific Data Provenance & Verification Audit')).toBeDefined();
+
+      fireEvent.keyDown(window, { key: 'Escape' });
+      expect(screen.queryByText('Scientific Data Provenance & Verification Audit')).toBeNull();
+      expect(document.activeElement).toBe(openBtn);
     });
   });
 
@@ -255,6 +275,20 @@ describe('Mutation Microscope User-Flow Automated Tests', () => {
 
       // Verify modal is dismissed
       expect(screen.queryByText('Scientific Methodology & Transparency Guide')).toBeNull();
+    });
+
+    it('closes the methodology modal on Escape and restores focus to the opener', () => {
+      render(<App />);
+
+      const openBtn = screen.getByRole('button', { name: /How It Works/i });
+      openBtn.focus();
+      expect(document.activeElement).toBe(openBtn);
+      fireEvent.click(openBtn);
+      expect(screen.getByText('Scientific Methodology & Transparency Guide')).toBeDefined();
+
+      fireEvent.keyDown(window, { key: 'Escape' });
+      expect(screen.queryByText('Scientific Methodology & Transparency Guide')).toBeNull();
+      expect(document.activeElement).toBe(openBtn);
     });
   });
 
@@ -303,6 +337,31 @@ describe('Mutation Microscope User-Flow Automated Tests', () => {
       // Final sanity check: core dashboard is intact
       expect(screen.getAllByText(/Mutation Microscope/i).length).toBeGreaterThan(0);
       expect(screen.getAllByText(/GRCh38/i).length).toBeGreaterThan(0);
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Flow 8: Zero-result search empty state
+  // --------------------------------------------------------------------------
+  describe('Flow 8: Zero-result search empty state', () => {
+    it('shows an intentional empty state with a reset action when search matches nothing', () => {
+      render(<App />);
+
+      const search = screen.getByRole('textbox', {
+        name: /Search variants by gene, disease, or locus/i,
+      });
+      fireEvent.change(search, { target: { value: 'zzzz-not-a-gene' } });
+
+      expect(screen.getByText('No matching variants')).toBeDefined();
+      expect(screen.getByText(/zzzz-not-a-gene/)).toBeDefined();
+      expect(screen.queryByRole('button', { name: /Previous Variant/i })).toBeDefined();
+
+      const resetBtn = screen.getByRole('button', { name: /Clear search & filters/i });
+      fireEvent.click(resetBtn);
+
+      expect(screen.queryByText('No matching variants')).toBeNull();
+      expect(screen.getAllByText('APOA1').length).toBeGreaterThanOrEqual(1);
+      expect((search as HTMLInputElement).value).toBe('');
     });
   });
 });

@@ -67,7 +67,7 @@ export const ModalityExplorer: React.FC<ModalityExplorerProps> = ({
             {modalities.length} Active
           </span>
         </h3>
-        <span className="text-[11px] text-slate-500 font-mono">
+        <span className="hidden sm:inline text-[11px] text-slate-500 font-mono">
           Click an assay to inspect track
         </span>
       </div>
@@ -121,11 +121,11 @@ export const ModalityExplorer: React.FC<ModalityExplorerProps> = ({
               </div>
 
               {/* Tissue / Context footer */}
-              <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                <span className="truncate max-w-[170px]" title={mod.primaryTissue}>
+                  <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between gap-2 text-[11px] text-slate-400 font-mono">
+                <span className="truncate min-w-0" title={mod.primaryTissue}>
                   {mod.primaryTissue}
                 </span>
-                <span className="text-slate-500">{mod.tissueOntology}</span>
+                <span className="text-slate-500 shrink-0">{mod.tissueOntology}</span>
               </div>
             </button>
           );
