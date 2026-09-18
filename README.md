@@ -7,6 +7,7 @@
 👉 [**Launch Live Demo: mutation-microscope.vercel.app**](https://mutation-microscope.vercel.app)
 
 [![CI](https://github.com/cyb3rcricket/mutation-microscope/actions/workflows/ci.yml/badge.svg)](https://github.com/cyb3rcricket/mutation-microscope/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Architecture Guide](https://img.shields.io/badge/Architecture-docs%2FARCHITECTURE.md-cyan.svg)](docs/ARCHITECTURE.md)
 [![Provenance Framework](https://img.shields.io/badge/Provenance-6--Class%20System-indigo.svg)](docs/PROVENANCE.md)
 [![DeepMind AlphaGenome](https://img.shields.io/badge/AlphaGenome-DeepMind-cyan.svg)](https://deepmind.google.com/science/alphagenome/)
@@ -197,5 +198,6 @@ For complete rules and definitions regarding the 6-tier scientific provenance cl
 
 ## ⚖️ License & Disclaimer
 
+- **Project License**: Original Mutation Microscope code authored in this repository is licensed under the [MIT License](LICENSE).
+- **Third-Party & Model Boundaries**: The MIT License applies exclusively to original project code. Google DeepMind AlphaGenome software, model outputs and predictions, AlphaGenome Atlas materials, published scientific benchmark datasets, reference genomes (GRCh38), transcript models (GENCODE v46 / MANE Select), and biological ontologies are **not** relicensed under MIT and remain governed by their respective licenses and terms of service. For complete attribution, component licenses, and boundary details, see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 - **Scientific Disclaimer**: Mutation Microscope provides *in silico* molecular predictions computed by AlphaGenome for educational exploration and research hypothesis generation. It is **never** intended for clinical diagnosis, patient triage, or medical treatment decisions.
-- **Model Terms**: AlphaGenome and AlphaGenome Atlas are research technologies of Google DeepMind. See [.licenses/alphagenome_single_variant_analysis_LICENSE.txt](.licenses/alphagenome_single_variant_analysis_LICENSE.txt) for license terms.

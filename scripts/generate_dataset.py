@@ -27,7 +27,7 @@ Modes of Operation:
      uv run scripts/generate_dataset.py --verify
 
 License & Terms:
-  AlphaGenome is developed by Google DeepMind. See .licenses/alphagenome_single_variant_analysis_LICENSE.txt
+  AlphaGenome is developed by Google DeepMind. See THIRD_PARTY_NOTICES.md
   and https://deepmind.google.com/science/alphagenome/ for terms of service.
   Predictions are for scientific demonstration and educational purposes only.
 """
