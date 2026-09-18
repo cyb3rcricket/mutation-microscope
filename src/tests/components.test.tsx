@@ -22,6 +22,8 @@ describe('Component Rendering & Scientific UI Verification', () => {
     expect(html).toContain('Data Provenance');
     expect(html).toContain('How It Works');
     expect(html).toContain('AlphaGenome');
+    expect(html).toContain('Tommi (@cyb3rcricket)');
+    expect(html).toContain('github.com/cyb3rcricket/mutation-microscope');
   });
 
   it('verifies Header contains navigation and provenance trigger', () => {
@@ -36,6 +38,8 @@ describe('Component Rendering & Scientific UI Verification', () => {
     expect(html).toContain('How It Works');
     expect(html).toContain('AlphaGenome Atlas');
     expect(html).toContain('GRCh38');
+    expect(html).toContain('github.com/cyb3rcricket/mutation-microscope');
+    expect(html).toContain('View source on GitHub');
   });
 
   it('verifies all 7 variants render cleanly in MolecularImpactPanel with honest AVI / Scorer labels', () => {
@@ -153,6 +157,8 @@ describe('Component Rendering & Scientific UI Verification', () => {
     expect(html).toContain('4. Scientific Caveats &amp; In Silico Limitations');
     expect(html).toContain('5. Six Evidence Classes Data Provenance Framework');
     expect(html).toContain('Avsec, Ž., Latysheva, N., Cheng, J. et al.');
+    expect(html).toContain('optional developer-side dataset pipeline');
+    expect(html).toContain('Public production does not perform live inference');
   });
 
   it('renders DataProvenanceModal with all 7 variants and generation metadata', () => {

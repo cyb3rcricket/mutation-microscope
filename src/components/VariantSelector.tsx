@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { VariantData } from '../types/variant';
+import { formatPercentileRank } from '../utils/format';
 import {
   ChevronLeft,
   ChevronRight,
@@ -107,7 +108,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Variant Prev/Next Navigation */}
           <div className="flex items-center space-x-3">
-            <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-mono uppercase tracking-wider text-slate-400 whitespace-nowrap">
               Variant <strong className="text-white">{currentIndex + 1}</strong> of {variants.length}
             </span>
 
@@ -130,26 +131,28 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
               </button>
             </div>
 
-            <span className="hidden sm:inline-block text-[11px] text-slate-500 font-mono">
+            <span className="hidden sm:inline-block text-[11px] text-slate-500 font-mono whitespace-nowrap">
               Use ← → keys to switch
             </span>
           </div>
 
           {/* Search input and category filter */}
           <div className="flex items-center space-x-2">
-            <div className="relative flex-1 sm:w-64">
+            <div className="relative flex-1 min-w-0 sm:w-64">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search gene, disease, locus..."
-                className="w-full pl-8 pr-3 py-1.5 text-xs bg-obsidian-950/80 border border-white/10 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50"
+                aria-label="Search variants by gene, disease, or locus"
+                className="w-full pl-8 pr-8 py-1.5 text-xs bg-obsidian-950/80 border border-white/10 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 hover:text-white"
+                  aria-label="Clear search query"
                 >
                   ✕
                 </button>
@@ -176,6 +179,38 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
         </div>
 
         {/* Variant Cards / Badges Carousel */}
+        {filteredVariants.length === 0 ? (
+          <div
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-dashed border-white/15 bg-obsidian-950/70 px-4 py-4"
+            role="status"
+          >
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-white">No matching variants</p>
+              <p className="text-xs text-slate-400 mt-0.5">
+                The curated seven-variant set has no records matching
+                {searchQuery.trim() ? (
+                  <>
+                    {' '}
+                    <span className="font-mono text-slate-300">“{searchQuery.trim()}”</span>
+                  </>
+                ) : (
+                  ' the current filters'
+                )}
+                {selectedCategory !== 'all' ? ' in this mechanism category' : ''}.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategory('all');
+              }}
+              className="self-start sm:self-auto px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-xs font-medium text-cyan-300 transition-colors shrink-0"
+            >
+              Clear search & filters
+            </button>
+          </div>
+        ) : (
         <div className="flex items-center space-x-2.5 overflow-x-auto pb-1.5 pt-0.5 scrollbar-thin">
           {filteredVariants.map((v) => {
             const isSelected = v.id === selectedVariant.id;
@@ -204,7 +239,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                         : 'bg-cyan-950/60 text-cyan-300 border border-cyan-500/30'
                     }`}
                   >
-                    {isNeutral ? 'Neutral' : `${v.avi.percentileRank.toFixed(2)}%`}
+                    {isNeutral ? 'Neutral' : formatPercentileRank(v.avi.percentileRank)}
                   </span>
                 </div>
 
@@ -219,6 +254,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
             );
           })}
         </div>
+        )}
       </div>
     </section>
   );

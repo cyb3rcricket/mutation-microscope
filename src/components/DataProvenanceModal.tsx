@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { VariantData, ProvenanceSourceType, EvidenceClass, DatasetMetadata } from '../types/variant';
 import metadataJson from '../data/metadata.json';
+import { useEscapeToClose } from '../hooks/useEscapeToClose';
 
 interface DataProvenanceModalProps {
   isOpen: boolean;
@@ -31,6 +32,8 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
   onSelectVariant,
 }) => {
   const [activeTab, setActiveTab] = useState<'variant' | 'framework' | 'dataset'>('variant');
+
+  useEscapeToClose(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -100,13 +103,13 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
     >
       <div className="relative w-full max-w-4xl bg-obsidian-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden my-6 max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-obsidian-950/90">
-          <div className="flex items-center space-x-3">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-white/10 bg-obsidian-950/90 gap-3">
+          <div className="flex items-center space-x-3 min-w-0">
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-dna-cyan">
               <FileCheck2 className="w-4 h-4" />
             </div>
             <div>
-              <h2 id="provenance-title" className="text-base font-bold text-white tracking-wide">
+              <h2 id="provenance-title" className="text-sm sm:text-base font-bold text-white tracking-wide leading-snug">
                 Scientific Data Provenance & Verification Audit
               </h2>
               <p className="text-xs text-slate-400">
@@ -117,7 +120,7 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-400 hover:text-white transition-colors shrink-0"
             aria-label="Close provenance modal"
           >
             <X className="w-5 h-5" />
@@ -125,10 +128,10 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center px-6 border-b border-white/10 bg-obsidian-950/50 gap-2 text-xs">
+        <div className="flex items-center px-4 sm:px-6 border-b border-white/10 bg-obsidian-950/50 gap-2 text-xs overflow-x-auto">
           <button
             onClick={() => setActiveTab('variant')}
-            className={`py-3 px-3 font-medium border-b-2 transition-all flex items-center gap-1.5 ${
+            className={`py-3 px-3 font-medium border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
               activeTab === 'variant'
                 ? 'border-dna-cyan text-white font-semibold'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
@@ -140,7 +143,7 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
 
           <button
             onClick={() => setActiveTab('framework')}
-            className={`py-3 px-3 font-medium border-b-2 transition-all flex items-center gap-1.5 ${
+            className={`py-3 px-3 font-medium border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
               activeTab === 'framework'
                 ? 'border-dna-cyan text-white font-semibold'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
@@ -152,7 +155,7 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
 
           <button
             onClick={() => setActiveTab('dataset')}
-            className={`py-3 px-3 font-medium border-b-2 transition-all flex items-center gap-1.5 ${
+            className={`py-3 px-3 font-medium border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
               activeTab === 'dataset'
                 ? 'border-dna-cyan text-white font-semibold'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
@@ -206,8 +209,9 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-medium transition-colors self-start sm:self-auto"
+                    title="Open Google DeepMind AlphaGenome Atlas (this URL is an Atlas entry point; it may not load this exact variant)"
                   >
-                    <span>Atlas Deep Link</span>
+                    <span>AlphaGenome Atlas</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
@@ -476,6 +480,7 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
                   <p className="text-xs text-slate-300">
                     Returned directly from an AlphaGenome API request (<code>dna_model.score_variant</code>).
                     Used only when the value was retrieved programmatically from the API and preserved with retrieval metadata (source, scorer, biosample, retrievedAt).
+                    This class describes pipeline-retrieved values; it is not a live production runtime. <code>live_api</code> enrichment is an optional developer-side data pipeline (<code>--fetch-live</code>). Public production runs entirely from committed provenance-tracked data, and the deployed React/Vite client does not call AlphaGenome live.
                   </p>
                 </div>
 
@@ -633,7 +638,7 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
                             )}
                           </div>
                           <p className="text-[11px] text-slate-400">
-                            Coexistence of live AlphaGenome API predictions with curated benchmark data. Scalar model outputs (<code>alphaGenomeScores</code> and top calibrated impact in <code>avi</code>) are queried live from the API, while continuous 1Mb modality tracks, Sashimi splice junctions, and genomic coordinates remain curated benchmark data.
+                            Coexistence of live AlphaGenome API predictions with curated benchmark data. Scalar model outputs (<code>alphaGenomeScores</code> and top calibrated impact in <code>avi</code>) are queried live from the API during optional developer-side dataset compilation, while continuous 1Mb modality tracks, Sashimi splice junctions, and genomic coordinates remain curated benchmark data. Public production still serves the committed JSON artifacts; the deployed client does not call AlphaGenome live.
                           </p>
                         </div>
 
@@ -673,7 +678,7 @@ export const DataProvenanceModal: React.FC<DataProvenanceModalProps> = ({
                             )}
                           </div>
                           <p className="text-[11px] text-slate-400">
-                            Full live API mode where all variant scores and assay predictions across all modalities are queried directly from live DeepMind AlphaGenome endpoints.
+                            Full live API pipeline mode, where variant scores and assay predictions are queried from DeepMind AlphaGenome endpoints during dataset compilation. This is a developer-side source mode, not the public production runtime: the deployed React/Vite client does not call AlphaGenome live and production serves committed provenance-tracked data.
                           </p>
                         </div>
                       </div>

@@ -16,7 +16,7 @@ export const ExplanationPanel: React.FC<ExplanationPanelProps> = ({ variant }) =
   return (
     <div className="glass-panel rounded-2xl p-6 border border-white/10 space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/10 pb-4">
+      <div className="flex items-start sm:items-center justify-between border-b border-white/10 pb-4 gap-3">
         <div className="flex items-center space-x-3">
           <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-dna-cyan">
             <FileText className="w-4 h-4" />
@@ -31,7 +31,7 @@ export const ExplanationPanel: React.FC<ExplanationPanelProps> = ({ variant }) =
           </div>
         </div>
 
-        <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-white/[0.04] text-slate-300 border border-white/5">
+        <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-white/[0.04] text-slate-300 border border-white/5 shrink-0">
           GRCh38 Assembly
         </span>
       </div>

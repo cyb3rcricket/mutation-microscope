@@ -81,7 +81,7 @@ export const ISMExplorer: React.FC<ISMExplorerProps> = ({
 
       {/* ISM Heatmap Matrix */}
       <div className="overflow-x-auto bg-obsidian-950/90 rounded-xl border border-white/10 p-4">
-        <div className="min-w-[500px]">
+        <div className="min-w-[500px]" role="grid" aria-label="In silico mutagenesis substitution scores">
           {/* Reference bases row */}
           <div className="flex items-center mb-2">
             <div className="w-12 text-xs font-mono text-slate-500 font-bold shrink-0">
@@ -109,7 +109,7 @@ export const ISMExplorer: React.FC<ISMExplorerProps> = ({
 
           {/* Matrix rows for A, C, G, T */}
           {bases.map((base) => (
-            <div key={base} className="flex items-center my-1.5">
+            <div key={base} className="flex items-center my-1.5" role="row">
               <div className="w-12 text-xs font-mono font-bold text-slate-300 shrink-0 flex items-center gap-1.5">
                 <span
                   className={`w-2.5 h-2.5 rounded-sm ${
@@ -135,7 +135,10 @@ export const ISMExplorer: React.FC<ISMExplorerProps> = ({
                   return (
                     <div
                       key={`cell-${base}-${pos}`}
-                      className={`flex-1 h-9 rounded flex items-center justify-center text-[11px] font-mono border transition-all ${getCellColor(
+                      role="gridcell"
+                      tabIndex={0}
+                      aria-label={`Position ${pos}: ${base} score ${score.toFixed(2)}${isTargetMutation ? ', selected mutation' : ''}${isRefBase ? ', reference base' : ''}`}
+                      className={`flex-1 h-9 rounded flex items-center justify-center text-[11px] font-mono border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/80 ${getCellColor(
                         score,
                         isTargetMutation
                       )} ${isRefBase ? 'ring-1 ring-blue-400' : ''}`}

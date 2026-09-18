@@ -66,7 +66,7 @@ export const GenomeZoomMicroscope: React.FC<GenomeZoomMicroscopeProps> = ({
   return (
     <div className="w-full glass-panel rounded-2xl overflow-hidden border border-white/10 shadow-2xl relative">
       {/* Header bar: Title & Zoom Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-3.5 border-b border-white/10 bg-obsidian-900/80 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-5 py-3.5 border-b border-white/10 bg-obsidian-900/80 gap-3">
         <div className="flex items-center space-x-3">
           <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-dna-cyan">
             <Layers className="w-4 h-4" />
@@ -82,10 +82,10 @@ export const GenomeZoomMicroscope: React.FC<GenomeZoomMicroscopeProps> = ({
         </div>
 
         {/* 3-Level Zoom Controls */}
-        <div className="flex items-center bg-obsidian-950 rounded-xl p-1 border border-white/10">
+        <div className="flex flex-wrap items-center bg-obsidian-950 rounded-xl p-1 border border-white/10 gap-0.5 max-w-full">
           <button
             onClick={() => setZoomLevel(1)}
-            className={`px-3 py-1 text-xs rounded-lg transition-all flex items-center space-x-1.5 ${
+            className={`px-2.5 sm:px-3 py-1 text-xs rounded-lg transition-all flex items-center space-x-1.5 whitespace-nowrap ${
               zoomLevel === 1
                 ? 'bg-cyan-500/20 text-cyan-300 font-semibold border border-cyan-500/40 shadow-glow-cyan'
                 : 'text-slate-400 hover:text-slate-200'
@@ -95,7 +95,7 @@ export const GenomeZoomMicroscope: React.FC<GenomeZoomMicroscopeProps> = ({
           </button>
           <button
             onClick={() => setZoomLevel(2)}
-            className={`px-3 py-1 text-xs rounded-lg transition-all flex items-center space-x-1.5 ${
+            className={`px-2.5 sm:px-3 py-1 text-xs rounded-lg transition-all flex items-center space-x-1.5 whitespace-nowrap ${
               zoomLevel === 2
                 ? 'bg-cyan-500/20 text-cyan-300 font-semibold border border-cyan-500/40 shadow-glow-cyan'
                 : 'text-slate-400 hover:text-slate-200'
@@ -105,7 +105,7 @@ export const GenomeZoomMicroscope: React.FC<GenomeZoomMicroscopeProps> = ({
           </button>
           <button
             onClick={() => setZoomLevel(3)}
-            className={`px-3 py-1 text-xs rounded-lg transition-all flex items-center space-x-1.5 ${
+            className={`px-2.5 sm:px-3 py-1 text-xs rounded-lg transition-all flex items-center space-x-1.5 whitespace-nowrap ${
               zoomLevel === 3
                 ? 'bg-cyan-500/20 text-cyan-300 font-semibold border border-cyan-500/40 shadow-glow-cyan'
                 : 'text-slate-400 hover:text-slate-200'
@@ -349,9 +349,15 @@ export const GenomeZoomMicroscope: React.FC<GenomeZoomMicroscopeProps> = ({
             <div className="p-5 rounded-2xl bg-obsidian-950/90 border border-white/10 shadow-inner space-y-4">
               {/* Primary 5' -> 3' Sense Strand */}
               <div>
-                <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 mb-2">
-                  <span>5' Sense Strand (Genomic Coordinates: {variant.pos - flanking.upstream.length} → {variant.pos + flanking.downstream.length})</span>
-                  <span>3'</span>
+                <div className="flex items-start justify-between text-[11px] font-mono text-slate-500 mb-2 gap-2">
+                  <span className="min-w-0 leading-relaxed">
+                    5' Sense Strand
+                    <span className="hidden sm:inline">
+                      {' '}
+                      (Genomic Coordinates: {variant.pos - flanking.upstream.length} → {variant.pos + flanking.downstream.length})
+                    </span>
+                  </span>
+                  <span className="shrink-0">3'</span>
                 </div>
 
                 <div className="flex items-center justify-center flex-wrap gap-1 font-mono text-xs sm:text-sm">
@@ -403,9 +409,9 @@ export const GenomeZoomMicroscope: React.FC<GenomeZoomMicroscopeProps> = ({
 
               {/* Watson-Crick Complementary Strand (3' -> 5') */}
               <div className="pt-2 border-t border-white/5">
-                <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 mb-2">
-                  <span>3' Watson-Crick Base-Pair Complementary Strand</span>
-                  <span>5'</span>
+                <div className="flex items-start justify-between text-[11px] font-mono text-slate-500 mb-2 gap-2">
+                  <span className="min-w-0 leading-relaxed">3' Watson-Crick Base-Pair Complementary Strand</span>
+                  <span className="shrink-0">5'</span>
                 </div>
 
                 <div className="flex items-center justify-center flex-wrap gap-1 font-mono text-xs sm:text-sm opacity-75">
@@ -447,7 +453,7 @@ export const GenomeZoomMicroscope: React.FC<GenomeZoomMicroscopeProps> = ({
 
             {/* Base Color Legend & Navigation */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-400 gap-3 pt-1">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center flex-wrap gap-x-3 gap-y-1">
                 <span className="text-[11px] text-slate-500">Color key:</span>
                 <span className="flex items-center space-x-1 font-mono text-[11px] text-emerald-400">
                   <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500/40 border border-emerald-500 inline-block" />
